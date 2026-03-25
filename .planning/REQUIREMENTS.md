@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DTLV-03**: Estados de loading (skeletons) e erro com mensagens claras
 - [x] **DTLV-04**: Exibicao de metadado expandivel por execucao com status por campo
 - [x] **DTLV-05**: Tempo relativo ("2 horas atras") com timestamp absoluto no hover
-- [ ] **DTLV-06**: Grafico de tendencia de healthscore ao longo do tempo (Account Coach, Auditoria)
+- [x] **DTLV-06**: Grafico de tendencia de healthscore ao longo do tempo (Account Coach, Auditoria)
 - [x] **DTLV-07**: Labels em portugues para campos de metadado (nao exibir keys crus)
 
 ### Infrastructure
@@ -105,7 +105,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTLV-03 | Phase 4 | Complete |
 | DTLV-04 | Phase 4 | Complete |
 | DTLV-05 | Phase 4 | Complete |
-| DTLV-06 | Phase 4 | Pending |
+| DTLV-06 | Phase 4 | Complete |
 | DTLV-07 | Phase 4 | Complete |
 | INFR-01 | Phase 3 | Complete |
 | INFR-02 | Phase 3 | Complete |
