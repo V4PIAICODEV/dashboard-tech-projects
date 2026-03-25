@@ -1,0 +1,83 @@
+import { useState } from "react";
+import type { AllProjectsResult } from "@/lib/data/types";
+import { analyzeAllExecutions } from "@/lib/data/errors";
+import { computeProjectHealth, sortByHealth } from "@/lib/health";
+import { PROJECT_REGISTRY } from "@/lib/config";
+import { queryClient } from "@/App";
+import { ProjectCard } from "@/components/ProjectCard";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorState } from "@/components/ErrorState";
+import { PartialFailureBanner } from "@/components/PartialFailureBanner";
+
+interface OverviewGridProps {
+  allProjectsResult: AllProjectsResult;
+}
+
+/**
+ * Grid of project cards sorted worst-first.
+ * Handles loading, error, empty, and partial failure states.
+ */
+export function OverviewGrid({ allProjectsResult }: OverviewGridProps) {
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  const {
+    allExecutions,
+    isLoading,
+    failedGroups,
+  } = allProjectsResult;
+
+  // Loading: show 7 skeleton cards
+  if (isLoading) {
+    return (
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        aria-busy="true"
+      >
+        {Array.from({ length: 7 }, (_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  // All failed: show error state
+  if (failedGroups.length === 4) {
+    return (
+      <ErrorState
+        onRetry={() => queryClient.invalidateQueries()}
+      />
+    );
+  }
+
+  // No executions and no failures: show empty state
+  if (allExecutions.length === 0 && failedGroups.length === 0) {
+    return <EmptyState />;
+  }
+
+  // Compute health for each project
+  const analyses = analyzeAllExecutions(allExecutions);
+  const healthList = PROJECT_REGISTRY.map((project) =>
+    computeProjectHealth(project.id, project.name, analyses)
+  );
+  const sorted = sortByHealth(healthList);
+
+  return (
+    <div>
+      {/* Partial failure banner */}
+      {failedGroups.length > 0 && failedGroups.length < 4 && !bannerDismissed && (
+        <PartialFailureBanner
+          failedCount={failedGroups.length}
+          onDismiss={() => setBannerDismissed(true)}
+        />
+      )}
+
+      {/* Project cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {sorted.map((health) => (
+          <ProjectCard key={health.projectId} health={health} />
+        ))}
+      </div>
+    </div>
+  );
+}

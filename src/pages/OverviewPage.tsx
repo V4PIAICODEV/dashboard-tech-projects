@@ -1,14 +1,12 @@
+import { useAllProjects } from "@/hooks/useAllProjects";
+import { OverviewGrid } from "@/components/OverviewGrid";
+
 /**
- * Overview page placeholder. Will be replaced with project cards grid
- * in Plan 03-02.
+ * Overview page showing all 7 project cards with health status.
+ * Delegates data fetching to useAllProjects and rendering to OverviewGrid.
  */
 export function OverviewPage() {
-  return (
-    <div>
-      <h2 className="text-xl font-semibold">Visao Geral</h2>
-      <p className="mt-2 text-muted-foreground">
-        Overview page -- project cards coming in Plan 03-02.
-      </p>
-    </div>
-  );
+  const allProjectsResult = useAllProjects();
+
+  return <OverviewGrid allProjectsResult={allProjectsResult} />;
 }

@@ -1,49 +1,57 @@
 import { Outlet } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { DashboardHeader } from "@/components/DashboardHeader";
+import { Toaster } from "@/components/ui/sonner";
 
 /**
  * App shell layout with header and main content area.
  * Renders child routes via <Outlet />.
  *
- * Header contains:
- * - Dashboard title
- * - Last-updated timestamp placeholder (wired in Plan 03-03)
- * - Refresh button placeholder (wired in Plan 03-03)
- * - Logout button
+ * Provides DashboardHeader with real-time data:
+ * - dataUpdatedAt: most recent query update timestamp
+ * - isLoading: any webhook query still loading
+ * - isRefetching: any webhook query refetching in background
  */
 export function AppLayout() {
-  const { logout } = useAuth();
+  const queryClientInstance = useQueryClient();
+  const isFetching = useIsFetching({ queryKey: ["webhook"] });
+
+  // Find the most recent dataUpdatedAt across all webhook queries
+  const queryCache = queryClientInstance.getQueryCache();
+  const webhookQueries = queryCache.findAll({ queryKey: ["webhook"] });
+
+  let dataUpdatedAt: Date | null = null;
+  let isLoading = false;
+
+  for (const query of webhookQueries) {
+    const state = query.state;
+    if (state.status === "pending") {
+      isLoading = true;
+    }
+    if (state.dataUpdatedAt) {
+      const updatedAt = new Date(state.dataUpdatedAt);
+      if (!dataUpdatedAt || updatedAt > dataUpdatedAt) {
+        dataUpdatedAt = updatedAt;
+      }
+    }
+  }
+
+  // If no webhook queries exist yet, we're still loading
+  if (webhookQueries.length === 0) {
+    isLoading = true;
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <h1 className="text-lg font-semibold tracking-tight">
-            Dashboard Tech Projects
-          </h1>
-
-          <div className="flex items-center gap-3">
-            {/* Last updated timestamp -- wired in Plan 03-03 */}
-            <span className="hidden text-sm text-muted-foreground sm:inline">
-              Ultima atualizacao: --
-            </span>
-
-            {/* Refresh button -- wired in Plan 03-03 */}
-            <Button variant="outline" size="sm" disabled>
-              Atualizar
-            </Button>
-
-            <Button variant="ghost" size="sm" onClick={logout}>
-              Sair
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <DashboardHeader
+        dataUpdatedAt={dataUpdatedAt}
+        isLoading={isLoading}
+        isRefetching={isFetching > 0}
+      />
+      <main className="mx-auto max-w-[1200px] px-8 pt-6 mt-16">
         <Outlet />
       </main>
+      <Toaster theme="dark" richColors />
     </div>
   );
 }
