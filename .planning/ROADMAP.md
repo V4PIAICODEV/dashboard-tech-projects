@@ -98,10 +98,10 @@ Plans:
   1. A multi-stage Docker build produces a nginx:alpine image serving the SPA with correct SPA routing fallback (all routes resolve to index.html)
   2. The deployed dashboard on EasyPanel loads, authenticates, fetches live webhook data, and displays correct project health -- end-to-end verified
   3. Webhook URLs and auth password are configured via environment variables, not hardcoded in the build
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md -- Dockerfile + nginx.conf + .dockerignore + EasyPanel deploy verification (INFR-04)
 
 ## Progress
 
