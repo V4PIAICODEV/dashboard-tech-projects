@@ -32,8 +32,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Detail Views
 
 - [ ] **DTLV-01**: Lista de execucoes por projeto com identificador relevante (id_kommo, email, client_name)
-- [ ] **DTLV-02**: Filtro por intervalo de data para historico de execucoes
-- [ ] **DTLV-03**: Estados de loading (skeletons) e erro com mensagens claras
+- [x] **DTLV-02**: Filtro por intervalo de data para historico de execucoes
+- [x] **DTLV-03**: Estados de loading (skeletons) e erro com mensagens claras
 - [ ] **DTLV-04**: Exibicao de metadado expandivel por execucao com status por campo
 - [ ] **DTLV-05**: Tempo relativo ("2 horas atras") com timestamp absoluto no hover
 - [ ] **DTLV-06**: Grafico de tendencia de healthscore ao longo do tempo (Account Coach, Auditoria)
@@ -101,8 +101,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-05 | Phase 3 | Complete |
 | DASH-06 | Phase 3 | Complete |
 | DTLV-01 | Phase 4 | Pending |
-| DTLV-02 | Phase 4 | Pending |
-| DTLV-03 | Phase 4 | Pending |
+| DTLV-02 | Phase 4 | Complete |
+| DTLV-03 | Phase 4 | Complete |
 | DTLV-04 | Phase 4 | Pending |
 | DTLV-05 | Phase 4 | Pending |
 | DTLV-06 | Phase 4 | Pending |
