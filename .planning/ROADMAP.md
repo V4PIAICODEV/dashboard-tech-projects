@@ -75,6 +75,7 @@ Plans:
 **Goal**: Users can drill into any project and see exactly which executions failed, which fields caused the failure, and filter by date range to focus on the relevant period
 **Depends on**: Phase 3
 **Requirements**: DTLV-01, DTLV-02, DTLV-03, DTLV-04, DTLV-05, DTLV-06, DTLV-07
+**Plans:** 3 plans
 **Success Criteria** (what must be TRUE):
   1. Detail page shows a list of executions for the selected project, each identified by its relevant field (id_kommo, email, or client_name)
   2. User can filter executions by date range; the list updates to show only executions within the selected interval
@@ -82,13 +83,12 @@ Plans:
   4. Loading states show skeleton placeholders and error states show clear messages when a webhook fails
   5. Timestamps display as relative time ("2 horas atras") with the absolute timestamp visible on hover
   6. Projects with healthscore (Account Coach, Auditoria) show a trend chart of healthscore values over time
-**Plans**: TBD
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md -- Install shadcn sheet/separator/chart + build DetailHeader + build DateFilter (DTLV-02, DTLV-03)
+- [ ] 04-02-PLAN.md -- Build ExecutionRow + ExecutionList + FieldRow + ExecutionDrawer (DTLV-01, DTLV-04, DTLV-05, DTLV-07)
+- [ ] 04-03-PLAN.md -- Build HealthscoreChart + wire ProjectDetailPage + date filter unit tests (DTLV-01, DTLV-02, DTLV-03, DTLV-06, DTLV-07)
 
 ### Phase 5: Docker Deployment
 **Goal**: The dashboard is deployed and accessible via HTTPS on EasyPanel, running as a lightweight Docker container with all configuration via environment variables
