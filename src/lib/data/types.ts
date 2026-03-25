@@ -46,3 +46,25 @@ export interface AllProjectsResult {
   failedGroups: WebhookGroupResult[];
   successfulGroups: WebhookGroupResult[];
 }
+
+// -- Error Detection Types (Phase 2) --
+
+/** Severity level for a single field's error detection result */
+export type Severity = "error" | "warning" | "pass";
+
+/** Result of error detection for a single metadata field */
+export interface FieldResult {
+  key: string;
+  label: string;
+  value: MetadataItem["value"];
+  type: MetadataItem["type"];
+  severity: Severity;
+}
+
+/** Aggregated error detection result for a single execution */
+export interface ExecutionAnalysis {
+  execution: ProjectExecution;
+  fields: FieldResult[];
+  counts: { error: number; warning: number; pass: number; total: number };
+  overallStatus: Severity;
+}
