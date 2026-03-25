@@ -75,7 +75,7 @@ Plans:
 **Goal**: Users can drill into any project and see exactly which executions failed, which fields caused the failure, and filter by date range to focus on the relevant period
 **Depends on**: Phase 3
 **Requirements**: DTLV-01, DTLV-02, DTLV-03, DTLV-04, DTLV-05, DTLV-06, DTLV-07
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 **Success Criteria** (what must be TRUE):
   1. Detail page shows a list of executions for the selected project, each identified by its relevant field (id_kommo, email, or client_name)
   2. User can filter executions by date range; the list updates to show only executions within the selected interval
@@ -87,7 +87,7 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md -- Install shadcn sheet/separator/chart + build DetailHeader + build DateFilter (DTLV-02, DTLV-03)
-- [ ] 04-02-PLAN.md -- Build ExecutionRow + ExecutionList + FieldRow + ExecutionDrawer (DTLV-01, DTLV-04, DTLV-05, DTLV-07)
+- [x] 04-02-PLAN.md -- Build ExecutionRow + ExecutionList + FieldRow + ExecutionDrawer (DTLV-01, DTLV-04, DTLV-05, DTLV-07)
 - [ ] 04-03-PLAN.md -- Build HealthscoreChart + wire ProjectDetailPage + date filter unit tests (DTLV-01, DTLV-02, DTLV-03, DTLV-06, DTLV-07)
 
 ### Phase 5: Docker Deployment
@@ -113,5 +113,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Data Fetching and Schema Normalization | 3/3 | Complete | 2026-03-25 |
 | 2. Error Detection Engine | 2/2 | Complete | 2026-03-25 |
 | 3. App Shell and Overview Dashboard | 1/3 | In progress | - |
-| 4. Detail Views and Filtering | 1/3 | In Progress|  |
+| 4. Detail Views and Filtering | 2/3 | In Progress|  |
 | 5. Docker Deployment | 0/1 | Not started | - |
