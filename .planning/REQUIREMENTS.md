@@ -11,10 +11,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **DATA-01**: Dashboard busca dados via GET de 4 endpoints de webhook distintos
 - [x] **DATA-02**: Normalizacao de 4 schemas diferentes em tipo unificado `ProjectExecution`
-- [ ] **DATA-03**: Deteccao de erro por checklist: campo `false` = item nao realizado (Handover Aquisicao, Handover Monetizacao, parte do Sales Coach)
-- [ ] **DATA-04**: Deteccao de erro por texto: campo vazio/null = informacao nao preenchida (BANT, Account Coach, campos especificos de Sales Coach e Auditoria)
-- [ ] **DATA-05**: Deteccao de erro por healthscore: `critical` ou `danger` = alerta (Auditoria, Account Coach)
-- [ ] **DATA-06**: Deteccao de erro por status array: `Falhas > 0` = erro (Banco de Dados de Midia)
+- [x] **DATA-03**: Deteccao de erro por checklist: campo `false` = item nao realizado (Handover Aquisicao, Handover Monetizacao, parte do Sales Coach)
+- [x] **DATA-04**: Deteccao de erro por texto: campo vazio/null = informacao nao preenchida (BANT, Account Coach, campos especificos de Sales Coach e Auditoria)
+- [x] **DATA-05**: Deteccao de erro por healthscore: `critical` ou `danger` = alerta (Auditoria, Account Coach)
+- [x] **DATA-06**: Deteccao de erro por status array: `Falhas > 0` = erro (Banco de Dados de Midia)
 - [x] **DATA-07**: Normalizacao de boolean strings (n8n serializa `false` como `"false"`)
 - [x] **DATA-08**: Validacao de schema com Zod para detectar drift nos webhooks
 - [ ] **DATA-09**: Breakdown campo-a-campo do metadado mostrando qual campo especifico falhou
@@ -86,10 +86,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
-| DATA-05 | Phase 2 | Pending |
-| DATA-06 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Complete |
+| DATA-04 | Phase 2 | Complete |
+| DATA-05 | Phase 2 | Complete |
+| DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 1 | Complete |
 | DATA-08 | Phase 1 | Complete |
 | DATA-09 | Phase 2 | Pending |
