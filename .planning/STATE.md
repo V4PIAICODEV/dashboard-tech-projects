@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-25T22:19:45.001Z"
+status: Executing Phase 05
+stopped_at: "Checkpoint: Task 2 human-verify — EasyPanel deployment (05-01-PLAN.md)"
+last_updated: "2026-03-25T22:32:48.072Z"
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 11
+  completed_phases: 5
+  total_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** Visao centralizada e imediata da saude de todas as automacoes internas
-**Current focus:** Phase 04 — detail-views-and-filtering
+**Current focus:** Phase 05 — docker-deployment
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
+Phase: 05 (docker-deployment) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Plan: Not started
 | Phase 04-detail-views-and-filtering P01 | 5min | 3 tasks | 5 files |
 | Phase 04-detail-views-and-filtering P02 | 8min | 3 tasks | 4 files |
 | Phase 04-detail-views-and-filtering P03 | 2min | 2 tasks | 3 files |
+| Phase 05-docker-deployment P01 | 2 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [Phase 04]: applyDateFilter exported from ProjectDetailPage.tsx for clean test imports without an extra util file
 - [Phase 04]: ErrorState used with hardcoded copy only (no heading/body props); onRetry wired to queryClient.invalidateQueries
 - [Phase 04]: HealthscoreChart uses ChartContainer which internally wraps ResponsiveContainer — no double-wrap needed
+- [Phase 05-docker-deployment]: VITE_* vars must be EasyPanel Build Variables (not Runtime Env Vars) -- Vite bakes them at build time
+- [Phase 05-docker-deployment]: nginx.conf serves index.html for all unmatched routes via try_files to support React Router
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T22:15:38.298Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-25T22:32:48.067Z
+Stopped at: Checkpoint: Task 2 human-verify — EasyPanel deployment (05-01-PLAN.md)
 Resume file: None

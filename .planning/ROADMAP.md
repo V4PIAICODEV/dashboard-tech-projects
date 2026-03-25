@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Error Detection Engine** - Detect errors across all 4 project types using checklist, text, healthscore, and status-array rules
 - [ ] **Phase 3: App Shell and Overview Dashboard** - Auth gate, overview page with 7 project cards, health badges, polling, and refresh
 - [x] **Phase 4: Detail Views and Filtering** - Per-project drill-down with execution history, field-level breakdowns, date filtering, and trend charts (completed 2026-03-25)
-- [ ] **Phase 5: Docker Deployment** - Multi-stage Docker build and deploy to EasyPanel with nginx serving the SPA
+- [x] **Phase 5: Docker Deployment** - Multi-stage Docker build and deploy to EasyPanel with nginx serving the SPA (completed 2026-03-25)
 
 ## Phase Details
 
@@ -98,10 +98,10 @@ Plans:
   1. A multi-stage Docker build produces a nginx:alpine image serving the SPA with correct SPA routing fallback (all routes resolve to index.html)
   2. The deployed dashboard on EasyPanel loads, authenticates, fetches live webhook data, and displays correct project health -- end-to-end verified
   3. Webhook URLs and auth password are configured via environment variables, not hardcoded in the build
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 05-01-PLAN.md -- Dockerfile + nginx.conf + .dockerignore + EasyPanel deploy verification (INFR-04)
+- [x] 05-01-PLAN.md -- Dockerfile + nginx.conf + .dockerignore + EasyPanel deploy verification (INFR-04)
 
 ## Progress
 
@@ -114,4 +114,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Error Detection Engine | 2/2 | Complete | 2026-03-25 |
 | 3. App Shell and Overview Dashboard | 1/3 | In progress | - |
 | 4. Detail Views and Filtering | 3/3 | Complete   | 2026-03-25 |
-| 5. Docker Deployment | 0/1 | Not started | - |
+| 5. Docker Deployment | 1/1 | Complete   | 2026-03-25 |
