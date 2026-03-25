@@ -22,12 +22,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Dashboard Overview
 
-- [ ] **DASH-01**: Cards de resumo dos 7 projetos com nome, contagem de erros e timestamp da ultima execucao
-- [ ] **DASH-02**: Indicadores de cor por projeto (verde = saudavel, amarelo = atencao, vermelho = critico)
-- [ ] **DASH-03**: Timestamp "ultima atualizacao" visivel no header
-- [ ] **DASH-04**: Badge de saude por projeto (healthy/warning/critical) baseado em regras de agregacao
-- [ ] **DASH-05**: Percentual de erro por projeto (erros/total de execucoes)
-- [ ] **DASH-06**: Navegacao de card para pagina de detalhe do projeto
+- [x] **DASH-01**: Cards de resumo dos 7 projetos com nome, contagem de erros e timestamp da ultima execucao
+- [x] **DASH-02**: Indicadores de cor por projeto (verde = saudavel, amarelo = atencao, vermelho = critico)
+- [x] **DASH-03**: Timestamp "ultima atualizacao" visivel no header
+- [x] **DASH-04**: Badge de saude por projeto (healthy/warning/critical) baseado em regras de agregacao
+- [x] **DASH-05**: Percentual de erro por projeto (erros/total de execucoes)
+- [x] **DASH-06**: Navegacao de card para pagina de detalhe do projeto
 
 ### Detail Views
 
@@ -41,8 +41,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: Autenticacao basica com senha compartilhada via variavel de ambiente
-- [ ] **INFR-02**: Refresh manual via botao no header
+- [x] **INFR-01**: Autenticacao basica com senha compartilhada via variavel de ambiente
+- [x] **INFR-02**: Refresh manual via botao no header
 - [ ] **INFR-03**: Auto-polling a cada 60 segundos via TanStack Query
 - [ ] **INFR-04**: Deploy via Docker (multi-stage: build -> nginx:alpine) no EasyPanel
 - [ ] **INFR-05**: Configuracao de webhooks via variaveis de ambiente (nao hardcoded)
@@ -94,12 +94,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-08 | Phase 1 | Complete |
 | DATA-09 | Phase 2 | Complete |
 | DATA-10 | Phase 1 | Complete |
-| DASH-01 | Phase 3 | Pending |
-| DASH-02 | Phase 3 | Pending |
-| DASH-03 | Phase 3 | Pending |
-| DASH-04 | Phase 3 | Pending |
-| DASH-05 | Phase 3 | Pending |
-| DASH-06 | Phase 3 | Pending |
+| DASH-01 | Phase 3 | Complete |
+| DASH-02 | Phase 3 | Complete |
+| DASH-03 | Phase 3 | Complete |
+| DASH-04 | Phase 3 | Complete |
+| DASH-05 | Phase 3 | Complete |
+| DASH-06 | Phase 3 | Complete |
 | DTLV-01 | Phase 4 | Pending |
 | DTLV-02 | Phase 4 | Pending |
 | DTLV-03 | Phase 4 | Pending |
@@ -107,8 +107,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTLV-05 | Phase 4 | Pending |
 | DTLV-06 | Phase 4 | Pending |
 | DTLV-07 | Phase 4 | Pending |
-| INFR-01 | Phase 3 | Pending |
-| INFR-02 | Phase 3 | Pending |
+| INFR-01 | Phase 3 | Complete |
+| INFR-02 | Phase 3 | Complete |
 | INFR-03 | Phase 3 | Pending |
 | INFR-04 | Phase 5 | Pending |
 | INFR-05 | Phase 1 | Pending |

@@ -15,6 +15,7 @@ Visão centralizada e imediata da saúde de todas as automações internas — a
 - ✓ Suporte a 4 tipos diferentes de webhook/estrutura de dados — Phase 1
 - ✓ Normalização de boolean strings do n8n — Phase 1
 - ✓ Validação de schema com Zod — Phase 1
+- ✓ Detecção automática de erros (itens false/incompletos no metadado) — Phase 2
 
 ### Active
 
@@ -145,4 +146,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after Phase 1 completion*
+*Last updated: 2026-03-25 after Phase 2 completion*

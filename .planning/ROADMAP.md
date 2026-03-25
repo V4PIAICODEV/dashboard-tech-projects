@@ -56,6 +56,7 @@ Plans:
 **Goal**: Users can log in and see the health of all 7 projects at a glance -- knowing immediately which projects need attention and which are healthy
 **Depends on**: Phase 2
 **Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, INFR-01, INFR-02, INFR-03
+**Plans:** 3 plans
 **Success Criteria** (what must be TRUE):
   1. User must enter a shared password to access the dashboard; without it, only the login page is visible
   2. Overview page shows 7 project cards, each displaying the project name, error count, and timestamp of the last execution
@@ -63,13 +64,12 @@ Plans:
   4. Each card shows the error rate as a percentage (errors / total executions)
   5. A "last updated" timestamp is visible in the header, data auto-refreshes every 60 seconds, and a manual refresh button triggers an immediate fetch
   6. Clicking a project card navigates to that project's detail page
-**Plans**: TBD
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [x] 03-01-PLAN.md -- Initialize shadcn/ui, React Router, auth context, and login page (INFR-01, DASH-06)
+- [x] 03-02-PLAN.md -- Dashboard components: header, project cards, overview grid, health logic (DASH-01 through DASH-05, INFR-02)
+- [ ] 03-03-PLAN.md -- Health tests, final wiring verification, build check (INFR-03, DASH-06)
 
 ### Phase 4: Detail Views and Filtering
 **Goal**: Users can drill into any project and see exactly which executions failed, which fields caused the failure, and filter by date range to focus on the relevant period
