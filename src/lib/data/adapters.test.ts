@@ -5,7 +5,7 @@ import {
   adaptGrupo3,
   adaptGrupo4,
 } from "./adapters";
-import type { ProjectExecution, MetadataItem } from "./types";
+import type { MetadataItem } from "./types";
 
 // -- Test fixtures --
 

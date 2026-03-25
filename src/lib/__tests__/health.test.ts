@@ -4,7 +4,7 @@ import {
   sortByHealth,
   HEALTH_LABELS,
 } from "@/lib/health";
-import type { ExecutionAnalysis, ProjectExecution, Severity } from "@/lib/data/types";
+import type { ExecutionAnalysis, Severity } from "@/lib/data/types";
 
 // -- Test helper --
 
