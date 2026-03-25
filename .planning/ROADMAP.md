@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01: Scaffold Vite project, types, config, env vars ✓ 2026-03-25
 - [x] 01-02: Normalizers, Zod schemas, 4 adapters (TDD)
-- [ ] 01-03: Fetcher pipeline, useAllProjects hook (TDD)
+- [x] 01-03: Fetcher pipeline, useAllProjects hook (TDD)
 
 ### Phase 2: Error Detection Engine
 **Goal**: The dashboard can accurately identify which executions have errors and which specific fields failed, across all 7 projects with their 4 different error detection strategies

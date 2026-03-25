@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: Dashboard busca dados via GET de 4 endpoints de webhook distintos
+- [x] **DATA-01**: Dashboard busca dados via GET de 4 endpoints de webhook distintos
 - [x] **DATA-02**: Normalizacao de 4 schemas diferentes em tipo unificado `ProjectExecution`
 - [ ] **DATA-03**: Deteccao de erro por checklist: campo `false` = item nao realizado (Handover Aquisicao, Handover Monetizacao, parte do Sales Coach)
 - [ ] **DATA-04**: Deteccao de erro por texto: campo vazio/null = informacao nao preenchida (BANT, Account Coach, campos especificos de Sales Coach e Auditoria)
@@ -18,7 +18,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-07**: Normalizacao de boolean strings (n8n serializa `false` como `"false"`)
 - [x] **DATA-08**: Validacao de schema com Zod para detectar drift nos webhooks
 - [ ] **DATA-09**: Breakdown campo-a-campo do metadado mostrando qual campo especifico falhou
-- [ ] **DATA-10**: Tratamento de falha parcial de webhook (um grupo falhando nao bloqueia os outros)
+- [x] **DATA-10**: Tratamento de falha parcial de webhook (um grupo falhando nao bloqueia os outros)
 
 ### Dashboard Overview
 
@@ -84,7 +84,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Pending |
@@ -93,7 +93,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-07 | Phase 1 | Complete |
 | DATA-08 | Phase 1 | Complete |
 | DATA-09 | Phase 2 | Pending |
-| DATA-10 | Phase 1 | Pending |
+| DATA-10 | Phase 1 | Complete |
 | DASH-01 | Phase 3 | Pending |
 | DASH-02 | Phase 3 | Pending |
 | DASH-03 | Phase 3 | Pending |
