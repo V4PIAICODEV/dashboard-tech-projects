@@ -17,7 +17,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-06**: Deteccao de erro por status array: `Falhas > 0` = erro (Banco de Dados de Midia)
 - [x] **DATA-07**: Normalizacao de boolean strings (n8n serializa `false` como `"false"`)
 - [x] **DATA-08**: Validacao de schema com Zod para detectar drift nos webhooks
-- [ ] **DATA-09**: Breakdown campo-a-campo do metadado mostrando qual campo especifico falhou
+- [x] **DATA-09**: Breakdown campo-a-campo do metadado mostrando qual campo especifico falhou
 - [x] **DATA-10**: Tratamento de falha parcial de webhook (um grupo falhando nao bloqueia os outros)
 
 ### Dashboard Overview
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 1 | Complete |
 | DATA-08 | Phase 1 | Complete |
-| DATA-09 | Phase 2 | Pending |
+| DATA-09 | Phase 2 | Complete |
 | DATA-10 | Phase 1 | Complete |
 | DASH-01 | Phase 3 | Pending |
 | DASH-02 | Phase 3 | Pending |

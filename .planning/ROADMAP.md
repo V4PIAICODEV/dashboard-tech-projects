@@ -50,7 +50,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Types, detection functions, and TDD tests for 4 field-level strategies (DATA-03, DATA-04, DATA-05, DATA-06)
-- [ ] 02-02-PLAN.md -- Aggregation layer: per-execution breakdown with counts and overall status (DATA-09)
+- [x] 02-02-PLAN.md -- Aggregation layer: per-execution breakdown with counts and overall status (DATA-09)
 
 ### Phase 3: App Shell and Overview Dashboard
 **Goal**: Users can log in and see the health of all 7 projects at a glance -- knowing immediately which projects need attention and which are healthy
