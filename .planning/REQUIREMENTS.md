@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **INFR-01**: Autenticacao basica com senha compartilhada via variavel de ambiente
 - [x] **INFR-02**: Refresh manual via botao no header
-- [ ] **INFR-03**: Auto-polling a cada 60 segundos via TanStack Query
+- [x] **INFR-03**: Auto-polling a cada 60 segundos via TanStack Query
 - [ ] **INFR-04**: Deploy via Docker (multi-stage: build -> nginx:alpine) no EasyPanel
 - [ ] **INFR-05**: Configuracao de webhooks via variaveis de ambiente (nao hardcoded)
 
@@ -109,7 +109,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTLV-07 | Phase 4 | Pending |
 | INFR-01 | Phase 3 | Complete |
 | INFR-02 | Phase 3 | Complete |
-| INFR-03 | Phase 3 | Pending |
+| INFR-03 | Phase 3 | Complete |
 | INFR-04 | Phase 5 | Pending |
 | INFR-05 | Phase 1 | Pending |
 
