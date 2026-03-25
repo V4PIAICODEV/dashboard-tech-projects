@@ -1,4 +1,4 @@
-import type { MetadataItem, Severity } from "./types";
+import type { MetadataItem, Severity, FieldResult, ExecutionAnalysis, ProjectExecution } from "./types";
 
 // Individual detector functions (not exported -- internal)
 
@@ -59,4 +59,32 @@ export function detectFieldSeverity(item: MetadataItem): Severity {
   const detect = DETECTOR[item.type];
   if (!detect) return "pass"; // graceful fallback for truly unknown types
   return detect(item);
+}
+
+// -- Aggregation Layer (Plan 02) --
+
+/** Analyze a single execution: classify each field and compute aggregate counts */
+export function analyzeExecution(exec: ProjectExecution): ExecutionAnalysis {
+  const fields: FieldResult[] = exec.metadata.map((item) => ({
+    key: item.key,
+    label: item.label,
+    value: item.value,
+    type: item.type,
+    severity: detectFieldSeverity(item),
+  }));
+
+  const counts = { error: 0, warning: 0, pass: 0, total: fields.length };
+  for (const f of fields) {
+    counts[f.severity]++;
+  }
+
+  const overallStatus: Severity =
+    counts.error > 0 ? "error" : counts.warning > 0 ? "warning" : "pass";
+
+  return { execution: exec, fields, counts, overallStatus };
+}
+
+/** Analyze a batch of executions */
+export function analyzeAllExecutions(executions: ProjectExecution[]): ExecutionAnalysis[] {
+  return executions.map(analyzeExecution);
 }
