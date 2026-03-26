@@ -28,6 +28,8 @@ function buildMetadataItems(
     let type: MetadataItem["type"];
     if (key === "healthscore") {
       type = "healthscore";
+    } else if (key === "status") {
+      type = "execution-status";
     } else if (typeof normalized === "boolean") {
       type = "boolean";
     } else {
@@ -42,11 +44,13 @@ function buildMetadataItems(
 
 /**
  * Adapt Grupo 1 raw webhook data (Handover Aquisicao, Handover Monetizacao, BANT)
- * into ProjectExecution[].
+ * into ProjectExecution[]. Skips items that fail Zod validation.
  */
 export function adaptGrupo1(rawArray: unknown[]): ProjectExecution[] {
-  return rawArray.map((item) => {
-    const parsed = grupo1Schema.parse(item);
+  return rawArray.flatMap((item) => {
+    const result = grupo1Schema.safeParse(item);
+    if (!result.success) return [];
+    const parsed = result.data;
     const projectId = parsed.project_id;
 
     return {
@@ -66,11 +70,13 @@ export function adaptGrupo1(rawArray: unknown[]): ProjectExecution[] {
 
 /**
  * Adapt Grupo 2 raw webhook data (Sales Coach AI, Account Coach AI)
- * into ProjectExecution[].
+ * into ProjectExecution[]. Skips items that fail Zod validation.
  */
 export function adaptGrupo2(rawArray: unknown[]): ProjectExecution[] {
-  return rawArray.map((item) => {
-    const parsed = grupo2Schema.parse(item);
+  return rawArray.flatMap((item) => {
+    const result = grupo2Schema.safeParse(item);
+    if (!result.success) return [];
+    const parsed = result.data;
     const projectId = parsed.project_id;
 
     return {
@@ -78,7 +84,7 @@ export function adaptGrupo2(rawArray: unknown[]): ProjectExecution[] {
       projectName: PROJECT_NAMES[projectId] ?? projectId,
       webhookGroup: 2 as const,
       date: parsed.data,
-      identifiers: { email: parsed.email, tag: parsed.tag },
+      identifiers: { email: parsed.email, tag: parsed.tag, score: parsed.score },
       metadata: buildMetadataItems(
         projectId,
         parsed.metadado as Record<string, unknown>
@@ -90,11 +96,13 @@ export function adaptGrupo2(rawArray: unknown[]): ProjectExecution[] {
 
 /**
  * Adapt Grupo 3 raw webhook data (Auditoria do Saber)
- * into ProjectExecution[].
+ * into ProjectExecution[]. Skips items that fail Zod validation.
  */
 export function adaptGrupo3(rawArray: unknown[]): ProjectExecution[] {
-  return rawArray.map((item) => {
-    const parsed = grupo3Schema.parse(item);
+  return rawArray.flatMap((item) => {
+    const result = grupo3Schema.safeParse(item);
+    if (!result.success) return [];
+    const parsed = result.data;
     const projectId = parsed.project_id;
 
     return {
@@ -113,43 +121,26 @@ export function adaptGrupo3(rawArray: unknown[]): ProjectExecution[] {
 }
 
 /**
- * Parse a status array string like "Sucessos: 5" into a MetadataItem.
- * Returns { key: "sucessos", label: "Sucessos", value: 5, type: "status-array" }
- */
-function parseStatusEntry(entry: string): MetadataItem {
-  const colonIndex = entry.indexOf(": ");
-  if (colonIndex === -1) {
-    return {
-      key: entry.toLowerCase().replace(/\s+/g, "_"),
-      label: entry,
-      value: null,
-      type: "status-array",
-    };
-  }
-
-  const label = entry.slice(0, colonIndex);
-  const countStr = entry.slice(colonIndex + 2);
-  const value = parseInt(countStr, 10);
-
-  return {
-    key: label.toLowerCase(),
-    label,
-    value: isNaN(value) ? null : value,
-    type: "status-array",
-  };
-}
-
-/**
  * Adapt Grupo 4 raw webhook data (Banco de Dados de Midia)
  * into ProjectExecution[].
- * NOTE: Uses "date" field (not "data") and status array (not metadado).
+ * NOTE: Uses "date" field (not "data") and a single status string (not metadado).
+ * Skips items that fail Zod validation.
  */
 export function adaptGrupo4(rawArray: unknown[]): ProjectExecution[] {
-  return rawArray.map((item) => {
-    const parsed = grupo4Schema.parse(item);
+  return rawArray.flatMap((item) => {
+    const result = grupo4Schema.safeParse(item);
+    if (!result.success) return [];
+    const parsed = result.data;
     const projectId = parsed.project_id;
 
-    const metadata: MetadataItem[] = parsed.status.map(parseStatusEntry);
+    const metadata: MetadataItem[] = [
+      {
+        key: "status",
+        label: "Status",
+        value: parsed.status,
+        type: "execution-status",
+      },
+    ];
 
     return {
       projectId,
@@ -159,6 +150,8 @@ export function adaptGrupo4(rawArray: unknown[]): ProjectExecution[] {
       identifiers: {
         client_name: parsed.client_name,
         ekyte_id: parsed.ekyte_id,
+        plataforma: parsed.plataforma,
+        type: parsed.type,
       },
       metadata,
       rawData: item,

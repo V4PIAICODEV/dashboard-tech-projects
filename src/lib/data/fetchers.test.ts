@@ -10,31 +10,31 @@ vi.mock("@/lib/config", () => ({
     grupo4: "https://test.example.com/webhook/grupo4",
   },
   PROJECT_NAMES: {
-    a6eb735f: "Handover Aquisicao",
-    "91e5abc2": "Handover Monetizacao",
-    "1522051f": "BANT",
-    "9902ec09": "Sales Coach AI",
-    "81034bbc": "Account Coach AI",
-    ddf44dbe: "Auditoria do Saber",
-    "7fd3b921": "Banco de Dados de Midia",
+    a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105: "Handover Aquisicao",
+    "91e5abc2e306b137953cf5bfdcc8be0f4185e888763889b166cf86fd22c18597": "Handover Monetizacao",
+    "1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710": "BANT",
+    "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba": "Sales Coach AI",
+    "81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f": "Account Coach AI",
+    ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83: "Auditoria do Saber",
+    "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058": "Banco de Dados de Midia",
   },
   PROJECT_GROUPS: {
-    a6eb735f: 1,
-    "91e5abc2": 1,
-    "1522051f": 1,
-    "9902ec09": 2,
-    "81034bbc": 2,
-    ddf44dbe: 3,
-    "7fd3b921": 4,
+    a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105: 1,
+    "91e5abc2e306b137953cf5bfdcc8be0f4185e888763889b166cf86fd22c18597": 1,
+    "1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710": 1,
+    "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba": 2,
+    "81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f": 2,
+    ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83: 3,
+    "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058": 4,
   },
   FIELD_LABELS: {
-    a6eb735f: { workspace_ekyte: "Workspace Ekyte criado?" },
-    "91e5abc2": {},
-    "1522051f": {},
-    "9902ec09": { resumo_reuniao: "Resumo da Reuniao" },
-    "81034bbc": {},
-    ddf44dbe: {},
-    "7fd3b921": {},
+    a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105: { workspace_ekyte: "Workspace Ekyte criado?" },
+    "91e5abc2e306b137953cf5bfdcc8be0f4185e888763889b166cf86fd22c18597": {},
+    "1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710": {},
+    "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba": { resumo_reuniao: "Resumo da Reuniao" },
+    "81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f": {},
+    ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83: {},
+    "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058": {},
   },
 }));
 
@@ -116,7 +116,7 @@ function mockResponse(body: unknown, status = 200): Response {
 describe("fetchGrupo1", () => {
   it("returns WebhookGroupResult with executions on success", async () => {
     const rawData = [
-      { project_id: "a6eb735f", data: "2026-03-25", id_kommo: "123", status: "ok", metadado: {} },
+      { project_id: "a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", data: "2026-03-25", id_kommo: "123", status: "ok", metadado: {} },
     ];
     vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse(rawData));
 
@@ -185,7 +185,7 @@ describe("fetchGrupo1", () => {
 describe("fetchGrupo2", () => {
   it("returns WebhookGroupResult with group=2 on success", async () => {
     const rawData = [
-      { project_id: "9902ec09", data: "2026-03-25", tag: "t", email: "e@e.com", score: "10", metadado: {} },
+      { project_id: "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba", data: "2026-03-25", tag: "t", email: "e@e.com", score: "10", metadado: {} },
     ];
     vi.mocked(globalThis.fetch).mockResolvedValue(mockResponse(rawData));
 
@@ -215,7 +215,7 @@ describe("fetchGrupo3", () => {
   it("returns WebhookGroupResult with group=3 on success", async () => {
     const rawData = [
       {
-        project_id: "ddf44dbe",
+        project_id: "ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83",
         data: "2026-03-25",
         id_kommo: "456",
         status_id: "s1",
@@ -253,7 +253,7 @@ describe("fetchGrupo4", () => {
   it("returns WebhookGroupResult with group=4 on success", async () => {
     const rawData = [
       {
-        project_id: "7fd3b921",
+        project_id: "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058",
         date: "2026-03-25",
         client_name: "Client A",
         ekyte_id: "ek1",

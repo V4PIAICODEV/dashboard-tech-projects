@@ -10,7 +10,7 @@ import type { MetadataItem } from "./types";
 // -- Test fixtures --
 
 const validGrupo1Handover = {
-  project_id: "a6eb735f",
+  project_id: "a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105",
   data: "2026-03-25",
   id_kommo: "12345",
   status: "completed",
@@ -33,7 +33,7 @@ const validGrupo1Handover = {
 };
 
 const validGrupo1Bant = {
-  project_id: "1522051f",
+  project_id: "1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710",
   data: "2026-03-25",
   id_kommo: "67890",
   status: "completed",
@@ -47,7 +47,7 @@ const validGrupo1Bant = {
 };
 
 const validGrupo2SalesCoach = {
-  project_id: "9902ec09",
+  project_id: "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba",
   data: "2026-03-25",
   tag: "call-review",
   email: "vendedor@empresa.com",
@@ -63,7 +63,7 @@ const validGrupo2SalesCoach = {
 };
 
 const validGrupo2AccountCoach = {
-  project_id: "81034bbc",
+  project_id: "81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f",
   data: "2026-03-25",
   tag: "account-review",
   email: "gerente@empresa.com",
@@ -81,7 +81,7 @@ const validGrupo2AccountCoach = {
 };
 
 const validGrupo3 = {
-  project_id: "ddf44dbe",
+  project_id: "ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83",
   data: "2026-03-25",
   id_kommo: "11111",
   status_id: "42",
@@ -99,13 +99,14 @@ const validGrupo3 = {
 };
 
 const validGrupo4 = {
-  project_id: "7fd3b921",
+  project_id: "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058",
   date: "2026-03-25",
   client_name: "Cliente ABC",
   ekyte_id: "ek-001",
   account_id: "acc-001",
   type: "instagram",
-  status: ["Sucessos: 5", "Falhas: 0"],
+  status: "Sucesso",
+  plataforma: "Facebook",
 };
 
 // -- Helper to find metadata item by key --
@@ -122,7 +123,7 @@ describe("adaptGrupo1", () => {
   it("produces ProjectExecution[] with correct projectId, projectName, webhookGroup", () => {
     const result = adaptGrupo1([validGrupo1Handover]);
     expect(result).toHaveLength(1);
-    expect(result[0].projectId).toBe("a6eb735f");
+    expect(result[0].projectId).toBe("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105");
     expect(result[0].projectName).toBe("Handover Aquisicao");
     expect(result[0].webhookGroup).toBe(1);
   });
@@ -161,7 +162,7 @@ describe("adaptGrupo1", () => {
 
   it("adapts BANT data with all text metadata", () => {
     const result = adaptGrupo1([validGrupo1Bant]);
-    expect(result[0].projectId).toBe("1522051f");
+    expect(result[0].projectId).toBe("1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710");
     expect(result[0].projectName).toBe("BANT");
 
     // All BANT fields are text
@@ -249,9 +250,10 @@ describe("adaptGrupo2", () => {
     expect(result[0].rawData).toBe(validGrupo2SalesCoach);
   });
 
-  it("throws on invalid data (Zod validation)", () => {
+  it("skips invalid data (safeParse)", () => {
     const invalid = { project_id: "test" }; // missing required fields
-    expect(() => adaptGrupo2([invalid])).toThrow();
+    const result = adaptGrupo2([invalid]);
+    expect(result).toHaveLength(0);
   });
 });
 
@@ -300,11 +302,13 @@ describe("adaptGrupo3", () => {
 // -- adaptGrupo4 Tests --
 
 describe("adaptGrupo4", () => {
-  it("produces ProjectExecution with client_name and ekyte_id in identifiers", () => {
+  it("produces ProjectExecution with client_name, ekyte_id, plataforma, and type in identifiers", () => {
     const result = adaptGrupo4([validGrupo4]);
     expect(result[0].identifiers).toEqual({
       client_name: "Cliente ABC",
       ekyte_id: "ek-001",
+      plataforma: "Facebook",
+      type: "instagram",
     });
   });
 
@@ -318,24 +322,18 @@ describe("adaptGrupo4", () => {
     expect(result[0].date).toBe("2026-03-25");
   });
 
-  it("parses status array into MetadataItem entries with type status-array", () => {
+  it("creates a single execution-status MetadataItem from status string", () => {
     const result = adaptGrupo4([validGrupo4]);
-    const sucessos = findMeta(result[0].metadata, "sucessos");
-    expect(sucessos).toBeDefined();
-    expect(sucessos?.type).toBe("status-array");
-    expect(sucessos?.label).toBe("Sucessos");
-    expect(sucessos?.value).toBe(5);
-
-    const falhas = findMeta(result[0].metadata, "falhas");
-    expect(falhas).toBeDefined();
-    expect(falhas?.type).toBe("status-array");
-    expect(falhas?.label).toBe("Falhas");
-    expect(falhas?.value).toBe(0);
+    const status = findMeta(result[0].metadata, "status");
+    expect(status).toBeDefined();
+    expect(status?.type).toBe("execution-status");
+    expect(status?.label).toBe("Status");
+    expect(status?.value).toBe("Sucesso");
   });
 
-  it("has exactly 2 metadata items from status array", () => {
+  it("has exactly 1 metadata item from status string", () => {
     const result = adaptGrupo4([validGrupo4]);
-    expect(result[0].metadata).toHaveLength(2);
+    expect(result[0].metadata).toHaveLength(1);
   });
 
   it("preserves rawData", () => {
@@ -348,8 +346,9 @@ describe("adaptGrupo4", () => {
     expect(result[0].projectName).toBe("Banco de Dados de Midia");
   });
 
-  it("throws on invalid data (Zod validation)", () => {
+  it("skips invalid data (safeParse)", () => {
     const invalid = { project_id: "test", date: "2026-03-25" }; // missing required fields
-    expect(() => adaptGrupo4([invalid])).toThrow();
+    const result = adaptGrupo4([invalid]);
+    expect(result).toHaveLength(0);
   });
 });

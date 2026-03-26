@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { ENV } from "@/lib/env";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -20,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = useCallback((password: string): boolean => {
-    const expected = import.meta.env.VITE_AUTH_PASSWORD;
+    const expected = ENV.VITE_AUTH_PASSWORD;
     if (password === expected) {
       sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
       setIsAuthenticated(true);

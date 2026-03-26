@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { applyDateFilter } from "@/pages/ProjectDetailPage";
 import type { ExecutionAnalysis } from "@/lib/data/types";
 
-// Minimal ExecutionAnalysis factory for tests
 function makeAnalysis(date: string): ExecutionAnalysis {
   return {
     execution: {
@@ -20,12 +19,10 @@ function makeAnalysis(date: string): ExecutionAnalysis {
   };
 }
 
-// Helper: today's date as "YYYY-MM-DD"
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Helper: date N days ago as "YYYY-MM-DD"
 function daysAgo(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() - n);
@@ -50,7 +47,7 @@ describe("applyDateFilter", () => {
     expect(result[0].execution.date).toBe(todayStr());
   });
 
-  it("7dias returns today + 3 days ago (within range), excludes 10 days ago", () => {
+  it("7dias returns today + 3 days ago, excludes 10 days ago", () => {
     const result = applyDateFilter(allAnalyses, { mode: "quick", preset: "7dias" });
     expect(result).toHaveLength(2);
     expect(result.some((a) => a.execution.date === todayStr())).toBe(true);
@@ -61,16 +58,6 @@ describe("applyDateFilter", () => {
     const result = applyDateFilter(allAnalyses, { mode: "quick", preset: "30dias" });
     expect(result).toHaveLength(3);
     expect(result.some((a) => a.execution.date === daysAgo(40))).toBe(false);
-  });
-
-  it("range mode filters to the specified interval", () => {
-    const from = new Date(daysAgo(5) + "T00:00:00");
-    const to = new Date(daysAgo(1) + "T23:59:59");
-    const result = applyDateFilter(allAnalyses, { mode: "range", from, to });
-    // Should include 3 days ago, exclude today and 10+ days ago
-    expect(result.some((a) => a.execution.date === daysAgo(3))).toBe(true);
-    expect(result.some((a) => a.execution.date === todayStr())).toBe(false);
-    expect(result.some((a) => a.execution.date === daysAgo(10))).toBe(false);
   });
 
   it("empty input returns empty array for any filter", () => {

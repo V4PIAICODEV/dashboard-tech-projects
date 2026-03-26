@@ -134,6 +134,18 @@ None beyond the deviations above.
 - ExecutionDrawer requires `analysis: ExecutionAnalysis | null`, `open: boolean`, `onClose: () => void`
 - DateFilter (Plan 01) drives the filter state that ExecutionList will consume via analyses prop
 
+## Self-Check: PASSED
+
+- FOUND: src/components/detail/ExecutionRow.tsx
+- FOUND: src/components/detail/ExecutionList.tsx
+- FOUND: src/components/detail/FieldRow.tsx
+- FOUND: src/components/detail/ExecutionDrawer.tsx
+- FOUND commit: 243d900 (feat: ExecutionRow)
+- FOUND commit: 22093d7 (feat: ExecutionList)
+- FOUND commit: 1252687 (feat: FieldRow + ExecutionDrawer)
+- FOUND commit: 74d4fa3 (docs: plan metadata)
+- Build: npm run build exits 0, 2275 modules transformed
+
 ---
 *Phase: 04-detail-views-and-filtering*
 *Completed: 2026-03-25*

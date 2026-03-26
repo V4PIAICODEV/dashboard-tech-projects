@@ -39,6 +39,26 @@ function formatFieldValue(field: FieldResult): React.ReactNode {
     return value === true ? "Sim" : "Nao";
   }
 
+  // Execution status: show "Sucesso" or "Falha" with severity badge
+  if (type === "execution-status") {
+    const label = severity === "pass" ? "Sucesso" : "Falha";
+    const colors =
+      severity === "pass" ? HEALTH_COLORS.healthy : HEALTH_COLORS.critical;
+    return (
+      <Badge
+        variant="outline"
+        className="text-xs font-normal px-1.5 py-0"
+        style={{
+          backgroundColor: colors.bg,
+          color: colors.text,
+          borderColor: colors.border,
+        }}
+      >
+        {label}
+      </Badge>
+    );
+  }
+
   // Healthscore: numeric value + severity badge
   if (type === "healthscore") {
     const severityLabel =
@@ -73,7 +93,7 @@ function formatFieldValue(field: FieldResult): React.ReactNode {
 
   // Status-array, text, and enum: display as string preserving whitespace
   return (
-    <span className="whitespace-pre-wrap text-right" style={{ maxWidth: "240px" }}>
+    <span className="whitespace-pre-wrap text-right">
       {String(value)}
     </span>
   );
@@ -83,24 +103,32 @@ interface FieldRowProps {
   field: FieldResult;
 }
 
+const SEVERITY_BG: Record<string, string> = {
+  error: "hsl(0 72% 15% / 0.3)",
+  warning: "hsl(48 96% 15% / 0.2)",
+  pass: "transparent",
+};
+
 export function FieldRow({ field }: FieldRowProps) {
   const config = SEVERITY_CONFIG[field.severity];
   const { Icon, color, ariaLabel } = config;
+  const bgColor = SEVERITY_BG[field.severity] ?? "transparent";
 
   return (
-    <div className="flex items-start justify-between py-2 border-b last:border-b-0">
-      {/* Left: icon + label */}
-      <div className="flex items-center gap-2 min-w-0">
-        <Icon
-          className="h-4 w-4 shrink-0"
-          style={{ color }}
-          aria-label={ariaLabel}
-        />
-        <span className="text-sm truncate">{field.label}</span>
-      </div>
-
-      {/* Right: value */}
-      <div className="ml-4 text-sm text-right">{formatFieldValue(field)}</div>
+    <div
+      className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2.5 px-2 rounded border-b last:border-b-0"
+      style={{ backgroundColor: bgColor }}
+    >
+      {/* Icon */}
+      <Icon
+        className="h-4 w-4 shrink-0"
+        style={{ color }}
+        aria-label={ariaLabel}
+      />
+      {/* Label */}
+      <span className="text-sm">{field.label}</span>
+      {/* Value */}
+      <div className="text-sm text-right">{formatFieldValue(field)}</div>
     </div>
   );
 }

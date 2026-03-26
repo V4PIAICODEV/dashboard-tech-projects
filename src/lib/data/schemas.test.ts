@@ -10,7 +10,7 @@ import { z } from "zod";
 // -- Test fixtures --
 
 const validGrupo1Handover = {
-  project_id: "a6eb735f",
+  project_id: "a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105",
   data: "2026-03-25",
   id_kommo: "12345",
   status: "completed",
@@ -33,7 +33,7 @@ const validGrupo1Handover = {
 };
 
 const validGrupo1Bant = {
-  project_id: "1522051f",
+  project_id: "1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710",
   data: "2026-03-25",
   id_kommo: "67890",
   status: "completed",
@@ -47,7 +47,7 @@ const validGrupo1Bant = {
 };
 
 const validGrupo2SalesCoach = {
-  project_id: "9902ec09",
+  project_id: "9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba",
   data: "2026-03-25",
   tag: "call-review",
   email: "vendedor@empresa.com",
@@ -63,7 +63,7 @@ const validGrupo2SalesCoach = {
 };
 
 const validGrupo2AccountCoach = {
-  project_id: "81034bbc",
+  project_id: "81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f",
   data: "2026-03-25",
   tag: "account-review",
   email: "gerente@empresa.com",
@@ -81,7 +81,7 @@ const validGrupo2AccountCoach = {
 };
 
 const validGrupo3 = {
-  project_id: "ddf44dbe",
+  project_id: "ddf44dbfec3de36038d12f215b354129f67b1ed9f0ce71ca53c22b6ab573ee83",
   data: "2026-03-25",
   id_kommo: "11111",
   status_id: "42",
@@ -99,13 +99,14 @@ const validGrupo3 = {
 };
 
 const validGrupo4 = {
-  project_id: "7fd3b921",
+  project_id: "7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058",
   date: "2026-03-25",
   client_name: "Cliente ABC",
   ekyte_id: "ek-001",
   account_id: "acc-001",
   type: "instagram",
-  status: ["Sucessos: 5", "Falhas: 0"],
+  status: "Sucesso",
+  plataforma: "Facebook",
 };
 
 // -- Grupo 1 Schema Tests --
@@ -186,7 +187,7 @@ describe("grupo3Schema", () => {
 // -- Grupo 4 Schema Tests --
 
 describe("grupo4Schema", () => {
-  it("parses valid Midia object with status array", () => {
+  it("parses valid Midia object with status string", () => {
     expect(() => grupo4Schema.parse(validGrupo4)).not.toThrow();
   });
 
@@ -195,9 +196,9 @@ describe("grupo4Schema", () => {
     expect(result.date).toBe("2026-03-25");
   });
 
-  it("requires status to be array of strings", () => {
-    const withBadStatus = { ...validGrupo4, status: "not an array" };
-    expect(() => grupo4Schema.parse(withBadStatus)).toThrow();
+  it("accepts status as a string (Sucesso or Falha)", () => {
+    const withFalha = { ...validGrupo4, status: "Falha" };
+    expect(() => grupo4Schema.parse(withFalha)).not.toThrow();
   });
 
   it("throws ZodError when client_name is missing", () => {

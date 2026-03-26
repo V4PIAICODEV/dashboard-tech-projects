@@ -10,4 +10,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/webhook": {
+        target: "https://ferrazpiai-n8n-editor.uyk8ty.easypanel.host",
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 });

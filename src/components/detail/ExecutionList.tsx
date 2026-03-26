@@ -1,13 +1,13 @@
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Inbox } from "lucide-react";
+import { ChevronDown, Inbox } from "lucide-react";
 import { ExecutionRow } from "@/components/detail/ExecutionRow";
 import type { ExecutionAnalysis } from "@/lib/data/types";
 
 interface ExecutionListProps {
   analyses: ExecutionAnalysis[];
   isLoading: boolean;
-  onRowClick: (analysis: ExecutionAnalysis) => void;
 }
 
 function SkeletonRow() {
@@ -47,8 +47,10 @@ function DetailEmptyState() {
 export function ExecutionList({
   analyses,
   isLoading,
-  onRowClick,
 }: ExecutionListProps) {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   if (isLoading) {
     return (
       <div className="bg-card rounded-lg border">
@@ -70,13 +72,36 @@ export function ExecutionList({
 
   return (
     <div className="bg-card rounded-lg border">
-      {sorted.map((analysis, index) => (
-        <ExecutionRow
-          key={`${analysis.execution.projectId}-${analysis.execution.date}-${index}`}
-          analysis={analysis}
-          onClick={() => onRowClick(analysis)}
-        />
-      ))}
+      {/* List header with collapse toggle */}
+      <button
+        type="button"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="flex w-full items-center justify-between px-4 py-3 border-b cursor-pointer hover:bg-accent/50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <ChevronDown
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+              isCollapsed ? "-rotate-90" : "rotate-0"
+            }`}
+          />
+          <span className="text-sm font-medium">
+            Execucoes ({sorted.length})
+          </span>
+        </div>
+      </button>
+
+      {/* Collapsible rows */}
+      {!isCollapsed &&
+        sorted.map((analysis, index) => (
+          <ExecutionRow
+            key={`${analysis.execution.projectId}-${analysis.execution.date}-${index}`}
+            analysis={analysis}
+            isExpanded={expandedIndex === index}
+            onToggle={() =>
+              setExpandedIndex(expandedIndex === index ? null : index)
+            }
+          />
+        ))}
     </div>
   );
 }

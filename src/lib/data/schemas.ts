@@ -6,6 +6,12 @@ import { z } from "zod";
  * may evolve and we should not strip data we don't explicitly know about).
  */
 
+/** Parses metadado: accepts both a plain object and a JSON-encoded string (n8n serializes objects as strings) */
+const metadadoField = z.preprocess(
+  (val) => (typeof val === "string" ? JSON.parse(val) : val),
+  z.looseObject({})
+);
+
 /**
  * Grupo 1: Handover Aquisicao, Handover Monetizacao, BANT
  * metadado is a looseObject -- different projects within the group have different keys
@@ -15,7 +21,7 @@ export const grupo1Schema = z.object({
   data: z.string(),
   id_kommo: z.string(),
   status: z.string(),
-  metadado: z.looseObject({}),
+  metadado: metadadoField,
 });
 
 /**
@@ -28,7 +34,7 @@ export const grupo2Schema = z.object({
   tag: z.string(),
   email: z.string(),
   score: z.string(),
-  metadado: z.looseObject({}),
+  metadado: metadadoField,
 });
 
 /**
@@ -42,7 +48,7 @@ export const grupo3Schema = z.object({
   status_id: z.string(),
   fase: z.string(),
   status: z.string(),
-  metadado: z.looseObject({}),
+  metadado: metadadoField,
 });
 
 /**
@@ -57,5 +63,6 @@ export const grupo4Schema = z.object({
   ekyte_id: z.string(),
   account_id: z.string(),
   type: z.string(),
-  status: z.array(z.string()),
+  status: z.string(),
+  plataforma: z.string(),
 });

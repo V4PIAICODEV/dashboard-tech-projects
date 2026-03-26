@@ -21,7 +21,7 @@ export interface MetadataItem {
   key: string;
   label: string; // Portuguese display label (e.g. "Workspace Ekyte criado?")
   value: string | boolean | number | null;
-  type: "boolean" | "text" | "enum" | "healthscore" | "status-array";
+  type: "boolean" | "text" | "enum" | "healthscore" | "status-array" | "execution-status";
 }
 
 /**

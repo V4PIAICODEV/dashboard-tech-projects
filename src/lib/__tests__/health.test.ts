@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { format } from "date-fns";
 import {
   computeProjectHealth,
   sortByHealth,
@@ -8,10 +9,13 @@ import type { ExecutionAnalysis, Severity } from "@/lib/data/types";
 
 // -- Test helper --
 
+/** Today's date as YYYY-MM-DD, ensures tests don't become "inactive" */
+const TODAY = format(new Date(), "yyyy-MM-dd");
+
 function mockAnalysis(
   projectId: string,
   overallStatus: Severity,
-  date: string
+  date: string = TODAY
 ): ExecutionAnalysis {
   return {
     execution: {
@@ -35,21 +39,21 @@ function mockAnalysis(
 }
 
 describe("computeProjectHealth", () => {
-  it("returns healthy with 0 executions", () => {
+  it("returns inactive with 0 executions", () => {
     const result = computeProjectHealth("proj-1", "Empty Project", []);
     expect(result.errorRate).toBe(0);
-    expect(result.status).toBe("healthy");
+    expect(result.status).toBe("inactive");
     expect(result.totalExecutions).toBe(0);
     expect(result.lastExecutionDate).toBeNull();
     expect(result.errorCount).toBe(0);
     expect(result.warningCount).toBe(0);
   });
 
-  it("returns healthy with all passing executions", () => {
+  it("returns healthy with all passing recent executions", () => {
     const analyses = [
-      mockAnalysis("proj-1", "pass", "2026-03-20"),
-      mockAnalysis("proj-1", "pass", "2026-03-21"),
-      mockAnalysis("proj-1", "pass", "2026-03-22"),
+      mockAnalysis("proj-1", "pass", TODAY),
+      mockAnalysis("proj-1", "pass", TODAY),
+      mockAnalysis("proj-1", "pass", TODAY),
     ];
     const result = computeProjectHealth("proj-1", "All Pass", analyses);
     expect(result.errorRate).toBe(0);
@@ -59,9 +63,9 @@ describe("computeProjectHealth", () => {
 
   it("returns warning for errorRate 10% (1 error out of 10)", () => {
     const analyses = [
-      mockAnalysis("proj-1", "error", "2026-03-20"),
-      ...Array.from({ length: 9 }, (_, i) =>
-        mockAnalysis("proj-1", "pass", `2026-03-${21 + i}`)
+      mockAnalysis("proj-1", "error", TODAY),
+      ...Array.from({ length: 9 }, () =>
+        mockAnalysis("proj-1", "pass", TODAY)
       ),
     ];
     const result = computeProjectHealth("proj-1", "Low Error", analyses);
@@ -71,11 +75,11 @@ describe("computeProjectHealth", () => {
 
   it("returns critical for errorRate 50% (5 errors out of 10)", () => {
     const analyses = [
-      ...Array.from({ length: 5 }, (_, i) =>
-        mockAnalysis("proj-1", "error", `2026-03-${10 + i}`)
+      ...Array.from({ length: 5 }, () =>
+        mockAnalysis("proj-1", "error", TODAY)
       ),
-      ...Array.from({ length: 5 }, (_, i) =>
-        mockAnalysis("proj-1", "pass", `2026-03-${20 + i}`)
+      ...Array.from({ length: 5 }, () =>
+        mockAnalysis("proj-1", "pass", TODAY)
       ),
     ];
     const result = computeProjectHealth("proj-1", "High Error", analyses);
@@ -85,11 +89,11 @@ describe("computeProjectHealth", () => {
 
   it("returns warning at the 30% boundary (3 errors out of 10)", () => {
     const analyses = [
-      ...Array.from({ length: 3 }, (_, i) =>
-        mockAnalysis("proj-1", "error", `2026-03-${10 + i}`)
+      ...Array.from({ length: 3 }, () =>
+        mockAnalysis("proj-1", "error", TODAY)
       ),
-      ...Array.from({ length: 7 }, (_, i) =>
-        mockAnalysis("proj-1", "pass", `2026-03-${20 + i}`)
+      ...Array.from({ length: 7 }, () =>
+        mockAnalysis("proj-1", "pass", TODAY)
       ),
     ];
     const result = computeProjectHealth("proj-1", "Boundary", analyses);
@@ -99,9 +103,9 @@ describe("computeProjectHealth", () => {
 
   it("filters executions by projectId — ignores other projects", () => {
     const analyses = [
-      mockAnalysis("proj-1", "error", "2026-03-20"),
-      mockAnalysis("proj-2", "error", "2026-03-21"),
-      mockAnalysis("proj-1", "pass", "2026-03-22"),
+      mockAnalysis("proj-1", "error", TODAY),
+      mockAnalysis("proj-2", "error", TODAY),
+      mockAnalysis("proj-1", "pass", TODAY),
     ];
     const result = computeProjectHealth("proj-1", "Filtered", analyses);
     expect(result.totalExecutions).toBe(2);
@@ -114,23 +118,33 @@ describe("computeProjectHealth", () => {
   it("picks the most recent date as lastExecutionDate", () => {
     const analyses = [
       mockAnalysis("proj-1", "pass", "2026-03-15"),
-      mockAnalysis("proj-1", "pass", "2026-03-25"),
+      mockAnalysis("proj-1", "pass", TODAY),
       mockAnalysis("proj-1", "pass", "2026-03-10"),
     ];
     const result = computeProjectHealth("proj-1", "Date Check", analyses);
-    expect(result.lastExecutionDate).toBe("2026-03-25");
+    expect(result.lastExecutionDate).toBe(TODAY);
   });
 
   it("counts warnings separately from errors", () => {
     const analyses = [
-      mockAnalysis("proj-1", "error", "2026-03-20"),
-      mockAnalysis("proj-1", "warning", "2026-03-21"),
-      mockAnalysis("proj-1", "pass", "2026-03-22"),
+      mockAnalysis("proj-1", "error", TODAY),
+      mockAnalysis("proj-1", "warning", TODAY),
+      mockAnalysis("proj-1", "pass", TODAY),
     ];
     const result = computeProjectHealth("proj-1", "Mixed", analyses);
     expect(result.errorCount).toBe(1);
     expect(result.warningCount).toBe(1);
     expect(result.totalExecutions).toBe(3);
+  });
+
+  it("returns inactive for projects with only old executions", () => {
+    const analyses = [
+      mockAnalysis("proj-1", "pass", "2025-01-01"),
+      mockAnalysis("proj-1", "error", "2025-01-02"),
+    ];
+    const result = computeProjectHealth("proj-1", "Old Data", analyses);
+    expect(result.status).toBe("inactive");
+    expect(result.totalExecutions).toBe(2);
   });
 });
 
@@ -161,9 +175,10 @@ describe("sortByHealth", () => {
 });
 
 describe("HEALTH_LABELS", () => {
-  it("maps healthy to Saudavel, warning to Atencao, critical to Critico", () => {
+  it("maps all statuses to Portuguese labels", () => {
     expect(HEALTH_LABELS.healthy).toBe("Saudavel");
     expect(HEALTH_LABELS.warning).toBe("Atencao");
     expect(HEALTH_LABELS.critical).toBe("Critico");
+    expect(HEALTH_LABELS.inactive).toBe("Inativo");
   });
 });

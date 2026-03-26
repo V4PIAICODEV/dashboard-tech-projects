@@ -2,6 +2,7 @@ import { RefreshCw } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { Button } from "@/components/ui/button";
+import { AlertSettings } from "@/components/AlertSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { queryClient } from "@/App";
 
@@ -41,6 +42,8 @@ export function DashboardHeader({
           <span className="hidden text-sm text-muted-foreground sm:inline">
             {lastUpdatedText}
           </span>
+
+          <AlertSettings />
 
           <Button
             variant="outline"

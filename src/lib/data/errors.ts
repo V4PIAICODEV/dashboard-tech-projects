@@ -8,10 +8,9 @@ function detectBoolean(item: MetadataItem): Severity {
   return "error"; // false, null, undefined all = error (missing data)
 }
 
-// D-05/D-08: Empty/null/whitespace text = error
-function detectText(item: MetadataItem): Severity {
-  if (item.value === null || item.value === undefined) return "error";
-  if (typeof item.value === "string" && item.value.trim() === "") return "error";
+// Text fields are informational only — they don't determine errors.
+// Error/success for text-heavy projects is determined by the "status" metadado field.
+function detectText(_item: MetadataItem): Severity {
   return "pass";
 }
 
@@ -40,6 +39,14 @@ function detectStatusArray(item: MetadataItem): Severity {
   return "pass"; // "sucessos" and other status-array items are informational
 }
 
+// Execution status: "sucesso" = pass, "falha" = error
+function detectExecutionStatus(item: MetadataItem): Severity {
+  if (typeof item.value === "string" && item.value.toLowerCase() === "sucesso") {
+    return "pass";
+  }
+  return "error"; // "falha", null, unknown
+}
+
 // Enum placeholder -- no current fields use this type
 function detectEnum(_item: MetadataItem): Severity {
   return "pass"; // placeholder for future enum-typed fields
@@ -51,6 +58,7 @@ const DETECTOR: Record<MetadataItem["type"], (item: MetadataItem) => Severity> =
   text: detectText,
   healthscore: detectHealthscore,
   "status-array": detectStatusArray,
+  "execution-status": detectExecutionStatus,
   enum: detectEnum,
 };
 
@@ -63,15 +71,35 @@ export function detectFieldSeverity(item: MetadataItem): Severity {
 
 // -- Aggregation Layer (Plan 02) --
 
-/** Analyze a single execution: classify each field and compute aggregate counts */
+/**
+ * Analyze a single execution: classify each field and compute aggregate counts.
+ *
+ * Two modes:
+ * - **Status-driven** (BANT, Sales Coach, Account Coach, Auditoria): the metadado
+ *   contains a "status" field ("sucesso"/"falha"). Only that field + healthscore
+ *   determine severity. All other fields (boolean, text) are informational (pass).
+ * - **Per-field** (Handover Aquisição, Handover Monetização, Banco de Dados de Mídia):
+ *   no "status" field — each field is evaluated individually.
+ */
 export function analyzeExecution(exec: ProjectExecution): ExecutionAnalysis {
-  const fields: FieldResult[] = exec.metadata.map((item) => ({
-    key: item.key,
-    label: item.label,
-    value: item.value,
-    type: item.type,
-    severity: detectFieldSeverity(item),
-  }));
+  const hasStatusField = exec.metadata.some((m) => m.type === "execution-status");
+
+  const fields: FieldResult[] = exec.metadata.map((item) => {
+    let severity: Severity;
+    if (hasStatusField && item.type !== "execution-status" && item.type !== "healthscore") {
+      // Status-driven mode: only status + healthscore fields can flag errors
+      severity = "pass";
+    } else {
+      severity = detectFieldSeverity(item);
+    }
+    return {
+      key: item.key,
+      label: item.label,
+      value: item.value,
+      type: item.type,
+      severity,
+    };
+  });
 
   const counts = { error: 0, warning: 0, pass: 0, total: fields.length };
   for (const f of fields) {

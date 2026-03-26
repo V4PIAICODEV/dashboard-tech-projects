@@ -37,18 +37,25 @@ function createFetcher(
 
       const json: unknown = await response.json();
 
-      if (!Array.isArray(json)) {
+      // Support both plain array and { data: [...] } wrapper (n8n default format)
+      const rawArray = Array.isArray(json)
+        ? json
+        : Array.isArray((json as Record<string, unknown>)?.data)
+          ? (json as Record<string, unknown>).data as unknown[]
+          : null;
+
+      if (!rawArray) {
         return {
           group,
           executions: [],
           error: new Error(
-            `Webhook grupo ${group}: expected array, got ${typeof json}`
+            `Webhook grupo ${group}: expected array or {data: array}, got ${typeof json}`
           ),
           lastFetched: null,
         };
       }
 
-      const executions = adapt(json);
+      const executions = adapt(rawArray);
 
       return {
         group,

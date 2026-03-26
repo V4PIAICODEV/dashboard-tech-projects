@@ -39,25 +39,25 @@ describe("detectFieldSeverity", () => {
 
   // -- Text fields (DATA-04) --
 
-  describe("text fields (DATA-04)", () => {
-    it("returns error for empty string", () => {
+  describe("text fields (informational — always pass)", () => {
+    it("returns pass for empty string (text fields are informational)", () => {
       const item: MetadataItem = {
         key: "resumo",
         label: "Resumo",
         value: "",
         type: "text",
       };
-      expect(detectFieldSeverity(item)).toBe("error");
+      expect(detectFieldSeverity(item)).toBe("pass");
     });
 
-    it("returns error for null", () => {
+    it("returns pass for null (text fields are informational)", () => {
       const item: MetadataItem = {
         key: "resumo",
         label: "Resumo",
         value: null,
         type: "text",
       };
-      expect(detectFieldSeverity(item)).toBe("error");
+      expect(detectFieldSeverity(item)).toBe("pass");
     });
 
     it("returns pass for non-empty text", () => {
@@ -70,12 +70,56 @@ describe("detectFieldSeverity", () => {
       expect(detectFieldSeverity(item)).toBe("pass");
     });
 
-    it("returns error for whitespace-only string (pitfall 1)", () => {
+    it("returns pass for whitespace-only string (text fields are informational)", () => {
       const item: MetadataItem = {
         key: "pontos_cegos",
         label: "Pontos Cegos",
         value: "   ",
         type: "text",
+      };
+      expect(detectFieldSeverity(item)).toBe("pass");
+    });
+  });
+
+  // -- Execution status fields --
+
+  describe("execution-status fields", () => {
+    it("returns pass for sucesso", () => {
+      const item: MetadataItem = {
+        key: "status",
+        label: "Status",
+        value: "sucesso",
+        type: "execution-status",
+      };
+      expect(detectFieldSeverity(item)).toBe("pass");
+    });
+
+    it("returns pass for Sucesso (case-insensitive)", () => {
+      const item: MetadataItem = {
+        key: "status",
+        label: "Status",
+        value: "Sucesso",
+        type: "execution-status",
+      };
+      expect(detectFieldSeverity(item)).toBe("pass");
+    });
+
+    it("returns error for falha", () => {
+      const item: MetadataItem = {
+        key: "status",
+        label: "Status",
+        value: "falha",
+        type: "execution-status",
+      };
+      expect(detectFieldSeverity(item)).toBe("error");
+    });
+
+    it("returns error for null status", () => {
+      const item: MetadataItem = {
+        key: "status",
+        label: "Status",
+        value: null,
+        type: "execution-status",
       };
       expect(detectFieldSeverity(item)).toBe("error");
     });
@@ -249,7 +293,7 @@ function makeExecution(
 
 describe("analyzeExecution (DATA-09)", () => {
   it("returns correct breakdown for Handover Aquisicao with 3 booleans (2 true, 1 false) and 1 filled text", () => {
-    const exec = makeExecution("a6eb735f", "Handover Aquisicao", [
+    const exec = makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", [
       { key: "workspace_ekyte", label: "Workspace Ekyte criado?", value: true, type: "boolean" },
       { key: "grupo_gchat", label: "Grupo Gchat criado?", value: true, type: "boolean" },
       { key: "projeto_atribuido", label: "Projeto atribuido?", value: false, type: "boolean" },
@@ -267,7 +311,7 @@ describe("analyzeExecution (DATA-09)", () => {
   });
 
   it("returns all-pass for BANT with 5 filled text fields", () => {
-    const exec = makeExecution("1522051f", "BANT", [
+    const exec = makeExecution("1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710", "BANT", [
       { key: "possiveis_objecoes", label: "Possiveis Objecoes", value: "Price concern", type: "text" },
       { key: "pontos_cegos", label: "Pontos Cegos", value: "Timeline unclear", type: "text" },
       { key: "possiveis_solucoes", label: "Possiveis Solucoes/Ofertas a Apresentar", value: "Discount option", type: "text" },
@@ -283,74 +327,71 @@ describe("analyzeExecution (DATA-09)", () => {
     expect(result.overallStatus).toBe("pass");
   });
 
-  it("returns errors for BANT with 2 empty text fields and 3 filled", () => {
-    const exec = makeExecution("1522051f", "BANT", [
+  it("returns all-pass for BANT with 2 empty text fields (text is informational) and status sucesso", () => {
+    const exec = makeExecution("1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710", "BANT", [
       { key: "possiveis_objecoes", label: "Possiveis Objecoes", value: "", type: "text" },
       { key: "pontos_cegos", label: "Pontos Cegos", value: null, type: "text" },
       { key: "possiveis_solucoes", label: "Possiveis Solucoes/Ofertas a Apresentar", value: "Discount option", type: "text" },
       { key: "pontos_atencao", label: "Pontos de Atencao", value: "Budget constraint", type: "text" },
       { key: "proximos_passos", label: "Proximos Passos Sugeridos", value: "Follow-up call", type: "text" },
-    ]);
-
-    const result = analyzeExecution(exec);
-
-    expect(result.counts.error).toBe(2);
-    expect(result.counts.pass).toBe(3);
-    expect(result.counts.total).toBe(5);
-    expect(result.overallStatus).toBe("error");
-  });
-
-  it("returns warning for Account Coach with healthscore care and all text fields filled", () => {
-    const exec = makeExecution("81034bbc", "Account Coach AI", [
-      { key: "resumo", label: "Resumo", value: "Client meeting summary", type: "text" },
-      { key: "categoria_primaria_conteudo", label: "Categoria Primaria do Conteudo", value: "Performance", type: "text" },
-      { key: "categoria_secundaria_conteudo", label: "Categoria Secundaria do Conteudo", value: "Estrategia", type: "text" },
-      { key: "healthscore", label: "Healthscore", value: "care", type: "healthscore" },
-      { key: "justificativa_healthscore", label: "Justificativa do Healthscore", value: "Needs attention", type: "text" },
-      { key: "oportunidade_monetizacao", label: "Oportunidade de Monetizacao", value: "Upsell opportunity", type: "text" },
-      { key: "combinados", label: "Combinados", value: "Weekly check-in", type: "text" },
-      { key: "plano_de_acao_sugerido", label: "Plano de Acao Sugerido", value: "Increase engagement", type: "text" },
-    ]);
-
-    const result = analyzeExecution(exec);
-
-    expect(result.counts.warning).toBe(1);
-    expect(result.counts.pass).toBe(7);
-    expect(result.counts.error).toBe(0);
-    expect(result.counts.total).toBe(8);
-    expect(result.overallStatus).toBe("warning");
-  });
-
-  it("returns all-pass for Midia with falhas 0 and sucessos 5", () => {
-    const exec = makeExecution("7fd3b921", "Banco de Dados de Midia", [
-      { key: "sucessos", label: "Sucessos", value: 5, type: "status-array" },
-      { key: "falhas", label: "Falhas", value: 0, type: "status-array" },
+      { key: "status", label: "Status", value: "sucesso", type: "execution-status" },
     ]);
 
     const result = analyzeExecution(exec);
 
     expect(result.counts.error).toBe(0);
-    expect(result.counts.pass).toBe(2);
-    expect(result.counts.total).toBe(2);
+    expect(result.counts.pass).toBe(6);
+    expect(result.counts.total).toBe(6);
     expect(result.overallStatus).toBe("pass");
   });
 
-  it("returns error for Midia with falhas 3 and sucessos 5", () => {
-    const exec = makeExecution("7fd3b921", "Banco de Dados de Midia", [
-      { key: "sucessos", label: "Sucessos", value: 5, type: "status-array" },
-      { key: "falhas", label: "Falhas", value: 3, type: "status-array" },
+  it("returns warning for Account Coach with healthscore care (status-driven mode)", () => {
+    const exec = makeExecution("81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f", "Account Coach AI", [
+      { key: "resumo", label: "Resumo", value: "Client meeting summary", type: "text" },
+      { key: "categoria_primaria_conteudo", label: "Categoria Primaria do Conteudo", value: "Performance", type: "text" },
+      { key: "healthscore", label: "Healthscore", value: "care", type: "healthscore" },
+      { key: "combinados", label: "Combinados", value: "Weekly check-in", type: "text" },
+      { key: "status", label: "Status", value: "sucesso", type: "execution-status" },
+    ]);
+
+    const result = analyzeExecution(exec);
+
+    // healthscore "care" = warning, status "sucesso" = pass, text fields = pass (status-driven)
+    expect(result.counts.warning).toBe(1);
+    expect(result.counts.pass).toBe(4);
+    expect(result.counts.error).toBe(0);
+    expect(result.counts.total).toBe(5);
+    expect(result.overallStatus).toBe("warning");
+  });
+
+  it("returns pass for Midia with status Sucesso", () => {
+    const exec = makeExecution("7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058", "Banco de Dados de Midia", [
+      { key: "status", label: "Status", value: "Sucesso", type: "execution-status" },
+    ]);
+
+    const result = analyzeExecution(exec);
+
+    expect(result.counts.error).toBe(0);
+    expect(result.counts.pass).toBe(1);
+    expect(result.counts.total).toBe(1);
+    expect(result.overallStatus).toBe("pass");
+  });
+
+  it("returns error for Midia with status Falha", () => {
+    const exec = makeExecution("7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058", "Banco de Dados de Midia", [
+      { key: "status", label: "Status", value: "Falha", type: "execution-status" },
     ]);
 
     const result = analyzeExecution(exec);
 
     expect(result.counts.error).toBe(1);
-    expect(result.counts.pass).toBe(1);
-    expect(result.counts.total).toBe(2);
+    expect(result.counts.pass).toBe(0);
+    expect(result.counts.total).toBe(1);
     expect(result.overallStatus).toBe("error");
   });
 
   it("returns zero counts and pass for execution with empty metadata", () => {
-    const exec = makeExecution("a6eb735f", "Handover Aquisicao", []);
+    const exec = makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", []);
 
     const result = analyzeExecution(exec);
 
@@ -363,8 +404,9 @@ describe("analyzeExecution (DATA-09)", () => {
   });
 
   it("preserves FieldResult shape with key, label, value, type, severity", () => {
-    const exec = makeExecution("1522051f", "BANT", [
+    const exec = makeExecution("1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710", "BANT", [
       { key: "pontos_cegos", label: "Pontos Cegos", value: "Some text", type: "text" },
+      { key: "status", label: "Status", value: "falha", type: "execution-status" },
     ]);
 
     const result = analyzeExecution(exec);
@@ -375,21 +417,57 @@ describe("analyzeExecution (DATA-09)", () => {
     expect(field.value).toBe("Some text");
     expect(field.type).toBe("text");
     expect(field.severity).toBe("pass");
+
+    // status field determines the error
+    const statusField = result.fields[1];
+    expect(statusField.severity).toBe("error");
+    expect(result.overallStatus).toBe("error");
   });
 
   it("preserves the same execution object reference", () => {
-    const exec = makeExecution("a6eb735f", "Handover Aquisicao", []);
+    const exec = makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", []);
 
     const result = analyzeExecution(exec);
 
     expect(result.execution).toBe(exec);
   });
 
+  it("status-driven mode: booleans become informational when status field exists", () => {
+    const exec = makeExecution("9902ec091d87e1125c0ee9f258cb3853cfe74bdf751d1568b017bb01a9d9ddba", "Sales Coach AI", [
+      { key: "spiced_aplicado", label: "SPICED aplicado?", value: false, type: "boolean" },
+      { key: "pediu_indicacao", label: "Pediu indicacao?", value: false, type: "boolean" },
+      { key: "resumo_reuniao", label: "Resumo da Reuniao", value: "Summary", type: "text" },
+      { key: "status", label: "Status", value: "sucesso", type: "execution-status" },
+    ]);
+
+    const result = analyzeExecution(exec);
+
+    // Status-driven: booleans + text = pass, status "sucesso" = pass
+    expect(result.counts.error).toBe(0);
+    expect(result.counts.pass).toBe(4);
+    expect(result.overallStatus).toBe("pass");
+  });
+
+  it("per-field mode: booleans still count errors when no status field (Handover)", () => {
+    const exec = makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", [
+      { key: "workspace_ekyte", label: "Workspace Ekyte criado?", value: false, type: "boolean" },
+      { key: "grupo_gchat", label: "Grupo Gchat criado?", value: true, type: "boolean" },
+    ]);
+
+    const result = analyzeExecution(exec);
+
+    // Per-field: boolean false = error
+    expect(result.counts.error).toBe(1);
+    expect(result.counts.pass).toBe(1);
+    expect(result.overallStatus).toBe("error");
+  });
+
   it("counts are consistent: error + warning + pass === total", () => {
-    const exec = makeExecution("81034bbc", "Account Coach AI", [
+    const exec = makeExecution("81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f", "Account Coach AI", [
       { key: "resumo", label: "Resumo", value: "", type: "text" },
       { key: "healthscore", label: "Healthscore", value: "care", type: "healthscore" },
       { key: "combinados", label: "Combinados", value: "Weekly sync", type: "text" },
+      { key: "status", label: "Status", value: "falha", type: "execution-status" },
     ]);
 
     const result = analyzeExecution(exec);
@@ -397,8 +475,8 @@ describe("analyzeExecution (DATA-09)", () => {
     expect(result.counts.error + result.counts.warning + result.counts.pass).toBe(result.counts.total);
     expect(result.counts.error).toBe(1);
     expect(result.counts.warning).toBe(1);
-    expect(result.counts.pass).toBe(1);
-    expect(result.counts.total).toBe(3);
+    expect(result.counts.pass).toBe(2);
+    expect(result.counts.total).toBe(4);
     expect(result.overallStatus).toBe("error");
   });
 });
@@ -406,14 +484,15 @@ describe("analyzeExecution (DATA-09)", () => {
 describe("analyzeAllExecutions", () => {
   it("processes a batch of 3 executions and returns ExecutionAnalysis[] of length 3", () => {
     const executions: ProjectExecution[] = [
-      makeExecution("a6eb735f", "Handover Aquisicao", [
+      makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", [
         { key: "workspace_ekyte", label: "Workspace Ekyte criado?", value: true, type: "boolean" },
       ]),
-      makeExecution("1522051f", "BANT", [
+      makeExecution("1522051fa3035e2674272ea1cadccd66a5c0a5345a024528d2b99ac31292b710", "BANT", [
         { key: "pontos_cegos", label: "Pontos Cegos", value: "", type: "text" },
+        { key: "status", label: "Status", value: "falha", type: "execution-status" },
       ]),
-      makeExecution("7fd3b921", "Banco de Dados de Midia", [
-        { key: "falhas", label: "Falhas", value: 0, type: "status-array" },
+      makeExecution("7fd3b921c8244a39bd0be982d77113b74f47fd9da49c0060d54f1afff1eb1058", "Banco de Dados de Midia", [
+        { key: "status", label: "Status", value: "Sucesso", type: "execution-status" },
       ]),
     ];
 
@@ -435,11 +514,12 @@ describe("analyzeAllExecutions", () => {
 
   it("each item in batch has correct counts and overallStatus", () => {
     const executions: ProjectExecution[] = [
-      makeExecution("81034bbc", "Account Coach AI", [
+      makeExecution("81034cbce6a2c1e0fe1d7a1fac995ada04d626a46a4d45dd1afd4ec50415f61f", "Account Coach AI", [
         { key: "healthscore", label: "Healthscore", value: "care", type: "healthscore" },
         { key: "resumo", label: "Resumo", value: "Summary text", type: "text" },
+        { key: "status", label: "Status", value: "sucesso", type: "execution-status" },
       ]),
-      makeExecution("a6eb735f", "Handover Aquisicao", [
+      makeExecution("a6eb735f07ea69c464f62703bfb51c4e89de4271d23a2e08950a2f0105602105", "Handover Aquisicao", [
         { key: "workspace_ekyte", label: "Workspace Ekyte criado?", value: false, type: "boolean" },
         { key: "grupo_gchat", label: "Grupo Gchat criado?", value: false, type: "boolean" },
       ]),
@@ -447,8 +527,10 @@ describe("analyzeAllExecutions", () => {
 
     const results = analyzeAllExecutions(executions);
 
-    expect(results[0].counts).toEqual({ error: 0, warning: 1, pass: 1, total: 2 });
+    // Account Coach: status-driven — healthscore care=warning, text+status=pass
+    expect(results[0].counts).toEqual({ error: 0, warning: 1, pass: 2, total: 3 });
     expect(results[0].overallStatus).toBe("warning");
+    // Handover: per-field — 2 boolean false = 2 errors
     expect(results[1].counts).toEqual({ error: 2, warning: 0, pass: 0, total: 2 });
     expect(results[1].overallStatus).toBe("error");
   });
