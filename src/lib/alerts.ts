@@ -27,13 +27,19 @@ function saveAlertedSet(set: Set<string>) {
   localStorage.setItem(STORAGE_KEY_ALERTED, JSON.stringify(trimmed));
 }
 
-/** Unique key for an execution (projectId + date + identifier) */
+/**
+ * Stable unique key for an execution.
+ * Uses ALL identifier fields sorted alphabetically to prevent key drift
+ * when webhook returns fields in different order or adds new fields.
+ */
 function executionKey(analysis: ExecutionAnalysis): string {
   const exec = analysis.execution;
-  const ids = exec.identifiers;
-  const identifier =
-    ids.id_kommo || ids.email || ids.client_name || ids.ekyte_id || exec.date;
-  return `${exec.projectId}:${exec.date}:${identifier}`;
+  const idParts = Object.entries(exec.identifiers)
+    .filter(([, v]) => v != null && v !== "")
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`)
+    .join("|");
+  return `${exec.projectId}:${exec.date}:${idParts}`;
 }
 
 /** Get execution identifier for alert text */

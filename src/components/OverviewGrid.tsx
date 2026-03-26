@@ -22,7 +22,7 @@ interface OverviewGridProps {
  */
 export function OverviewGrid({ allProjectsResult }: OverviewGridProps) {
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const alertProcessedRef = useRef<number>(0);
+  const alertRunningRef = useRef(false);
 
   const {
     allExecutions,
@@ -42,14 +42,14 @@ export function OverviewGrid({ allProjectsResult }: OverviewGridProps) {
     return sortByHealth(healthList);
   }, [analyses]);
 
-  // Process alerts for new errors (fire-and-forget, once per data update)
+  // Process alerts for new errors (deduplicated via localStorage keys)
   useEffect(() => {
-    const executionCount = allExecutions.length;
-    if (executionCount > 0 && executionCount !== alertProcessedRef.current) {
-      alertProcessedRef.current = executionCount;
-      processAlerts(analyses);
-    }
-  }, [allExecutions.length, analyses]);
+    if (analyses.length === 0 || alertRunningRef.current) return;
+    alertRunningRef.current = true;
+    processAlerts(analyses).finally(() => {
+      alertRunningRef.current = false;
+    });
+  }, [analyses]);
 
   // Loading: show 7 skeleton cards
   if (isLoading) {
