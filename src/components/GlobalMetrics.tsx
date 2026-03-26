@@ -6,7 +6,6 @@ import {
   Moon,
   Zap,
 } from "lucide-react";
-import { isWithinInterval, subHours, startOfDay, endOfDay, parseISO } from "date-fns";
 import type { ProjectHealth } from "@/lib/health";
 
 interface GlobalMetricsProps {
