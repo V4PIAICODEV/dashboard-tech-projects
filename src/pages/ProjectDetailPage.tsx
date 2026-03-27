@@ -93,7 +93,11 @@ export function ProjectDetailPage() {
   const { allExecutions, isLoading, groups } = useAllProjects();
   const isRefetching = useIsFetching() > 0;
 
-  const [dateFilter, setDateFilter] = useState<FilterState>({ mode: "quick", preset: "tudo" });
+  const isBancoMidia = id === PROJECT_IDS.BANCO_MIDIA;
+  const [dateFilter, setDateFilter] = useState<FilterState>({
+    mode: "quick",
+    preset: isBancoMidia ? "hoje" : "tudo",
+  });
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("todos");
 
   // Invalid project id — redirect to overview
@@ -114,7 +118,6 @@ export function ProjectDetailPage() {
   const dateFiltered = applyDateFilter(allAnalyses, dateFilter);
   const filteredAnalyses = applyStatusFilter(dateFiltered, statusFilter);
 
-  const isBancoMidia = id === PROJECT_IDS.BANCO_MIDIA;
   const platformGroups = useMemo(
     () => (isBancoMidia ? groupByPlatform(filteredAnalyses) : null),
     [isBancoMidia, filteredAnalyses]

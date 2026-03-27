@@ -76,8 +76,8 @@ export function detectFieldSeverity(item: MetadataItem): Severity {
  *
  * Two modes:
  * - **Status-driven** (BANT, Sales Coach, Account Coach, Auditoria): the metadado
- *   contains a "status" field ("sucesso"/"falha"). Only that field + healthscore
- *   determine severity. All other fields (boolean, text) are informational (pass).
+ *   contains a "status" field ("sucesso"/"falha"). Only that field determines
+ *   severity. All other fields (healthscore, boolean, text) are informational (pass).
  * - **Per-field** (Handover Aquisição, Handover Monetização, Banco de Dados de Mídia):
  *   no "status" field — each field is evaluated individually.
  */
@@ -86,8 +86,8 @@ export function analyzeExecution(exec: ProjectExecution): ExecutionAnalysis {
 
   const fields: FieldResult[] = exec.metadata.map((item) => {
     let severity: Severity;
-    if (hasStatusField && item.type !== "execution-status" && item.type !== "healthscore") {
-      // Status-driven mode: only status + healthscore fields can flag errors
+    if (hasStatusField && item.type !== "execution-status") {
+      // Status-driven mode: only status field determines errors
       severity = "pass";
     } else {
       severity = detectFieldSeverity(item);

@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, Inbox } from "lucide-react";
 import { ExecutionRow } from "@/components/detail/ExecutionRow";
 import type { ExecutionAnalysis } from "@/lib/data/types";
+
+const PAGE_SIZE = 50;
 
 interface ExecutionListProps {
   analyses: ExecutionAnalysis[];
@@ -50,6 +52,12 @@ export function ExecutionList({
 }: ExecutionListProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Reset visible count when data changes (e.g. new filter applied)
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [analyses]);
 
   if (isLoading) {
     return (
@@ -90,18 +98,30 @@ export function ExecutionList({
         </div>
       </button>
 
-      {/* Collapsible rows */}
-      {!isCollapsed &&
-        sorted.map((analysis, index) => (
-          <ExecutionRow
-            key={`${analysis.execution.projectId}-${analysis.execution.date}-${index}`}
-            analysis={analysis}
-            isExpanded={expandedIndex === index}
-            onToggle={() =>
-              setExpandedIndex(expandedIndex === index ? null : index)
-            }
-          />
-        ))}
+      {/* Paginated rows */}
+      {!isCollapsed && (
+        <>
+          {sorted.slice(0, visibleCount).map((analysis, index) => (
+            <ExecutionRow
+              key={`${analysis.execution.projectId}-${analysis.execution.date}-${index}`}
+              analysis={analysis}
+              isExpanded={expandedIndex === index}
+              onToggle={() =>
+                setExpandedIndex(expandedIndex === index ? null : index)
+              }
+            />
+          ))}
+          {visibleCount < sorted.length && (
+            <button
+              type="button"
+              onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+              className="w-full px-4 py-3 text-sm font-medium text-primary hover:bg-accent/50 transition-colors border-t"
+            >
+              Mostrar mais ({sorted.length - visibleCount} restantes)
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 }
