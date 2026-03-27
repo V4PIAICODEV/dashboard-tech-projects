@@ -11,21 +11,54 @@ interface ClientOverviewTableProps {
   analyses: ExecutionAnalysis[];
 }
 
+/** Known dimension keys from Account Coach AI metadado */
+const DIMENSION_KEYS = [
+  "Engajamento & Satisfação",
+  "Expectativas x Entregas",
+  "Resultados e Performance",
+  "Relacionamento e Comunicação",
+  "Consciência da Jornada V4",
+] as const;
+
+const DIMENSION_SHORT: Record<string, string> = {
+  "Engajamento & Satisfação": "Engaj.",
+  "Expectativas x Entregas": "Expect.",
+  "Resultados e Performance": "Result.",
+  "Relacionamento e Comunicação": "Comun.",
+  "Consciência da Jornada V4": "Jornada",
+};
+
+const FLAG_COLORS: Record<string, { bg: string; text: string }> = {
+  green: { bg: "hsl(142 71% 25%)", text: "hsl(142 71% 73%)" },
+  yellow: { bg: "hsl(48 96% 25%)", text: "hsl(48 96% 73%)" },
+  red: { bg: "hsl(0 72% 25%)", text: "hsl(0 72% 73%)" },
+};
+
 interface ClientRow {
   clientName: string;
   account: string;
   latestHealthscore: number | null;
   healthStatus: HealthStatus;
+  healthscoreCategory: string | null;
+  saudeFlag: string | null;
+  mediaGeral: number | null;
+  dimensions: Record<string, number | null>;
   monetizationOpportunity: string | null;
   lastExecutionDate: string;
   executionCount: number;
 }
 
-// Healthscore numeric ranges to status
 function healthscoreToStatus(value: number): HealthStatus {
   if (value >= 70) return "healthy";
   if (value >= 40) return "warning";
   return "critical";
+}
+
+function scoreColor(value: number | null): string {
+  if (value === null) return "text-muted-foreground";
+  if (value >= 70) return "text-green-400";
+  if (value >= 40) return "text-yellow-400";
+  return "text-red-400";
 }
 
 function buildClientRows(analyses: ExecutionAnalysis[]): ClientRow[] {
@@ -33,9 +66,7 @@ function buildClientRows(analyses: ExecutionAnalysis[]): ClientRow[] {
     string,
     {
       account: string;
-      healthscores: { value: number; date: string }[];
-      monetization: string | null;
-      dates: string[];
+      executions: { date: string; fields: ExecutionAnalysis["fields"] }[];
     }
   >();
 
@@ -46,88 +77,139 @@ function buildClientRows(analyses: ExecutionAnalysis[]): ClientRow[] {
 
     const existing = clientMap.get(clientName) ?? {
       account,
-      healthscores: [],
-      monetization: null,
-      dates: [],
+      executions: [],
     };
 
-    existing.dates.push(analysis.execution.date);
-
-    // Extract healthscore
-    const hsField = analysis.fields.find((f) => f.key === "healthscore");
-    if (hsField) {
-      const num =
-        typeof hsField.value === "number"
-          ? hsField.value
-          : parseFloat(String(hsField.value));
-      if (!isNaN(num)) {
-        existing.healthscores.push({
-          value: num,
-          date: analysis.execution.date,
-        });
-      }
-    }
-
-    // Extract monetization opportunity
-    const monField = analysis.fields.find(
-      (f) => f.key === "oportunidade_monetizacao"
-    );
-    if (monField && monField.value && String(monField.value).trim()) {
-      existing.monetization = String(monField.value);
-    }
+    existing.executions.push({
+      date: analysis.execution.date,
+      fields: analysis.fields,
+    });
 
     clientMap.set(clientName, existing);
   }
 
   const rows: ClientRow[] = [];
   for (const [clientName, data] of clientMap) {
-    // Sort healthscores by date, take most recent
-    const sortedHs = [...data.healthscores].sort((a, b) =>
+    // Sort executions by date descending, take latest
+    const sorted = [...data.executions].sort((a, b) =>
       b.date.localeCompare(a.date)
     );
-    const latestHs = sortedHs[0]?.value ?? null;
+    const latest = sorted[0];
+    if (!latest) continue;
 
-    // Sort dates, take most recent
-    const sortedDates = [...data.dates].sort((a, b) => b.localeCompare(a));
-    const lastDate = sortedDates[0] ?? "";
+    // Extract healthscore (categorical: safe/care/danger/critical)
+    const hsField = latest.fields.find((f) => f.key === "healthscore");
+    const hsCategory =
+      hsField && typeof hsField.value === "string" ? hsField.value : null;
+
+    // Extract numeric healthscore for status
+    const hsNum =
+      hsField && hsField.value !== null
+        ? typeof hsField.value === "number"
+          ? hsField.value
+          : parseFloat(String(hsField.value))
+        : NaN;
+    const latestHealthscore = isNaN(hsNum) ? null : hsNum;
+
+    // Extract Status_saude_flag
+    const flagField = latest.fields.find(
+      (f) => f.key === "Status_saude_flag" || f.key === "status_saude_flag"
+    );
+    const saudeFlag =
+      flagField && typeof flagField.value === "string"
+        ? flagField.value
+        : null;
+
+    // Extract Média geral
+    const mediaField = latest.fields.find((f) =>
+      f.key.toLowerCase().includes("média geral") ||
+      f.key.toLowerCase().includes("media geral")
+    );
+    const mediaRaw = mediaField?.value;
+    const mediaNum =
+      mediaRaw !== null && mediaRaw !== undefined
+        ? typeof mediaRaw === "number"
+          ? mediaRaw
+          : parseFloat(String(mediaRaw))
+        : NaN;
+    const mediaGeral = isNaN(mediaNum) ? null : mediaNum;
+
+    // Extract dimension scores
+    const dimensions: Record<string, number | null> = {};
+    for (const dimKey of DIMENSION_KEYS) {
+      const field = latest.fields.find((f) => f.key === dimKey);
+      if (field && field.value !== null && field.value !== undefined) {
+        const num =
+          typeof field.value === "number"
+            ? field.value
+            : parseFloat(String(field.value));
+        dimensions[dimKey] = isNaN(num) ? null : num;
+      } else {
+        dimensions[dimKey] = null;
+      }
+    }
+
+    // Extract monetization opportunity
+    const monField = latest.fields.find(
+      (f) => f.key === "oportunidade_monetizacao"
+    );
+    const monetizationOpportunity =
+      monField && monField.value && String(monField.value).trim()
+        ? String(monField.value)
+        : null;
 
     rows.push({
       clientName,
       account: data.account,
-      latestHealthscore: latestHs,
+      latestHealthscore,
       healthStatus:
-        latestHs !== null ? healthscoreToStatus(latestHs) : "inactive",
-      monetizationOpportunity: data.monetization,
-      lastExecutionDate: lastDate,
-      executionCount: data.dates.length,
+        latestHealthscore !== null
+          ? healthscoreToStatus(latestHealthscore)
+          : mediaGeral !== null
+            ? healthscoreToStatus(mediaGeral)
+            : "inactive",
+      healthscoreCategory: hsCategory,
+      saudeFlag,
+      mediaGeral,
+      dimensions,
+      monetizationOpportunity,
+      lastExecutionDate: sorted[0]?.date ?? "",
+      executionCount: data.executions.length,
     });
   }
 
-  // Sort by healthscore ascending (worst first)
   return rows.sort((a, b) => {
-    if (a.latestHealthscore === null && b.latestHealthscore === null) return 0;
-    if (a.latestHealthscore === null) return 1;
-    if (b.latestHealthscore === null) return -1;
-    return a.latestHealthscore - b.latestHealthscore;
+    const aVal = a.mediaGeral ?? a.latestHealthscore ?? 999;
+    const bVal = b.mediaGeral ?? b.latestHealthscore ?? 999;
+    return aVal - bVal; // Worst first
   });
 }
 
-type SortKey = "clientName" | "latestHealthscore" | "lastExecutionDate" | "executionCount";
+type SortKey =
+  | "clientName"
+  | "mediaGeral"
+  | "latestHealthscore"
+  | "lastExecutionDate"
+  | "executionCount";
 
 export function ClientOverviewTable({
   projectId,
   analyses,
 }: ClientOverviewTableProps) {
   const [showTable, setShowTable] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>("latestHealthscore");
+  const [sortKey, setSortKey] = useState<SortKey>("mediaGeral");
   const [sortAsc, setSortAsc] = useState(true);
 
-  // Only render for Account Coach AI
   if (projectId !== PROJECT_IDS.ACCOUNT_COACH) {
     return null;
   }
 
   const rows = useMemo(() => buildClientRows(analyses), [analyses]);
+
+  // Detect if dimension data is available
+  const hasDimensions = rows.some((r) =>
+    DIMENSION_KEYS.some((k) => r.dimensions[k] !== null)
+  );
 
   const sorted = useMemo(() => {
     const copy = [...rows];
@@ -136,6 +218,9 @@ export function ClientOverviewTable({
       switch (sortKey) {
         case "clientName":
           cmp = a.clientName.localeCompare(b.clientName);
+          break;
+        case "mediaGeral":
+          cmp = (a.mediaGeral ?? -1) - (b.mediaGeral ?? -1);
           break;
         case "latestHealthscore":
           cmp = (a.latestHealthscore ?? -1) - (b.latestHealthscore ?? -1);
@@ -189,14 +274,32 @@ export function ClientOverviewTable({
                 >
                   Cliente{sortIndicator("clientName")}
                 </th>
+                {rows.some((r) => r.saudeFlag) && (
+                  <th className="py-2 px-2 text-muted-foreground font-medium">
+                    Flag
+                  </th>
+                )}
+                <th
+                  className="py-2 px-2 cursor-pointer hover:text-foreground text-muted-foreground font-medium"
+                  onClick={() => handleSort("mediaGeral")}
+                >
+                  Média{sortIndicator("mediaGeral")}
+                </th>
+                {hasDimensions &&
+                  DIMENSION_KEYS.map((key) => (
+                    <th
+                      key={key}
+                      className="py-2 px-2 text-muted-foreground font-medium text-center"
+                      title={key}
+                    >
+                      {DIMENSION_SHORT[key] ?? key}
+                    </th>
+                  ))}
                 <th
                   className="py-2 px-2 cursor-pointer hover:text-foreground text-muted-foreground font-medium"
                   onClick={() => handleSort("latestHealthscore")}
                 >
                   Healthscore{sortIndicator("latestHealthscore")}
-                </th>
-                <th className="py-2 px-2 text-muted-foreground font-medium">
-                  Status
                 </th>
                 <th className="py-2 px-2 text-muted-foreground font-medium">
                   Oportunidade
@@ -205,29 +308,79 @@ export function ClientOverviewTable({
                   className="py-2 px-2 cursor-pointer hover:text-foreground text-muted-foreground font-medium"
                   onClick={() => handleSort("executionCount")}
                 >
-                  Execucoes{sortIndicator("executionCount")}
+                  Exec.{sortIndicator("executionCount")}
                 </th>
                 <th
                   className="py-2 px-2 cursor-pointer hover:text-foreground text-muted-foreground font-medium"
                   onClick={() => handleSort("lastExecutionDate")}
                 >
-                  Ultima execucao{sortIndicator("lastExecutionDate")}
+                  Última exec.{sortIndicator("lastExecutionDate")}
                 </th>
               </tr>
             </thead>
             <tbody>
               {sorted.map((row) => (
-                <tr key={row.clientName} className="border-b last:border-b-0">
+                <tr
+                  key={row.clientName}
+                  className="border-b last:border-b-0"
+                >
                   <td className="py-2 px-2 font-medium">{row.clientName}</td>
-                  <td className="py-2 px-2">
-                    {row.latestHealthscore !== null
-                      ? row.latestHealthscore
+                  {rows.some((r) => r.saudeFlag) && (
+                    <td className="py-2 px-2 text-center">
+                      {row.saudeFlag ? (
+                        <span
+                          className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                          style={
+                            FLAG_COLORS[row.saudeFlag.toLowerCase()] ?? {
+                              bg: "transparent",
+                              text: "inherit",
+                            }
+                          }
+                        >
+                          {row.saudeFlag}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  )}
+                  <td
+                    className={`py-2 px-2 font-semibold ${scoreColor(row.mediaGeral)}`}
+                  >
+                    {row.mediaGeral !== null
+                      ? Math.round(row.mediaGeral)
                       : "—"}
                   </td>
+                  {hasDimensions &&
+                    DIMENSION_KEYS.map((key) => {
+                      const val = row.dimensions[key];
+                      return (
+                        <td
+                          key={key}
+                          className={`py-2 px-2 text-center ${scoreColor(val)}`}
+                        >
+                          {val !== null ? Math.round(val) : "—"}
+                        </td>
+                      );
+                    })}
                   <td className="py-2 px-2">
-                    <HealthBadge status={row.healthStatus} />
+                    {row.healthscoreCategory ? (
+                      <HealthBadge
+                        status={
+                          row.healthscoreCategory === "safe"
+                            ? "healthy"
+                            : row.healthscoreCategory === "care"
+                              ? "warning"
+                              : "critical"
+                        }
+                      />
+                    ) : row.latestHealthscore !== null ? (
+                      <HealthBadge status={row.healthStatus} />
+                    ) : (
+                      "—"
+                    )}
                   </td>
-                  <td className="py-2 px-2 max-w-[200px] truncate">
+                  <td className="py-2 px-2 max-w-[200px] truncate text-muted-foreground">
                     {row.monetizationOpportunity ?? "—"}
                   </td>
                   <td className="py-2 px-2">{row.executionCount}</td>

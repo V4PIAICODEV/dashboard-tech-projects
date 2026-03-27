@@ -14,6 +14,11 @@ import { HealthscoreChart } from "@/components/detail/HealthscoreChart";
 import { ExecutionVolumeChart } from "@/components/detail/ExecutionVolumeChart";
 import { ClientOverviewTable } from "@/components/detail/ClientOverviewTable";
 import { VendorRankingTable } from "@/components/detail/VendorRankingTable";
+import { DimensionRadarChart } from "@/components/detail/DimensionRadarChart";
+import { DimensionRankingChart } from "@/components/detail/DimensionRankingChart";
+import { HealthscoreDistributionChart } from "@/components/detail/HealthscoreDistributionChart";
+import { ChecklistComplianceChart } from "@/components/detail/ChecklistComplianceChart";
+import { PlatformBreakdownChart } from "@/components/detail/PlatformBreakdownChart";
 import { ErrorState } from "@/components/ErrorState";
 import type { ExecutionAnalysis } from "@/lib/data/types";
 
@@ -157,14 +162,23 @@ export function ProjectDetailPage() {
           />
         )}
 
-        {/* Healthscore chart (only for Account Coach AI and Auditoria do Saber) */}
-        <HealthscoreChart projectId={id} analyses={filteredAnalyses} />
+        {/* === Project-specific analytics === */}
 
-        {/* Client overview table (only for Account Coach AI) */}
+        {/* Account Coach AI: radar + ranking + distribution + healthscore trend + client table */}
+        <DimensionRadarChart projectId={id} analyses={filteredAnalyses} />
+        <DimensionRankingChart projectId={id} analyses={filteredAnalyses} />
+        <HealthscoreDistributionChart projectId={id} analyses={filteredAnalyses} />
+        <HealthscoreChart projectId={id} analyses={filteredAnalyses} />
         <ClientOverviewTable projectId={id} analyses={filteredAnalyses} />
 
-        {/* Vendor ranking table (only for Sales Coach AI) */}
+        {/* Sales Coach AI: vendor ranking */}
         <VendorRankingTable projectId={id} analyses={filteredAnalyses} />
+
+        {/* Handover Aquisição / Monetização: checklist compliance */}
+        <ChecklistComplianceChart projectId={id} analyses={filteredAnalyses} />
+
+        {/* Banco de Dados de Mídia: platform breakdown */}
+        <PlatformBreakdownChart projectId={id} analyses={filteredAnalyses} />
       </main>
     </div>
   );

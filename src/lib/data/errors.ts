@@ -1,4 +1,8 @@
 import type { MetadataItem, Severity, FieldResult, ExecutionAnalysis, ProjectExecution } from "./types";
+import { PROJECT_IDS } from "@/lib/config";
+
+/** Projects that use per-field error detection (boolean checklist items) */
+const PER_FIELD_PROJECTS = new Set([PROJECT_IDS.HANDOVER_AQUISICAO, PROJECT_IDS.HANDOVER_MONETIZACAO]);
 
 // Individual detector functions (not exported -- internal)
 
@@ -75,18 +79,19 @@ export function detectFieldSeverity(item: MetadataItem): Severity {
  * Analyze a single execution: classify each field and compute aggregate counts.
  *
  * Two modes:
- * - **Status-driven** (BANT, Sales Coach, Account Coach, Auditoria): the metadado
- *   contains a "status" field ("sucesso"/"falha"). Only that field determines
- *   severity. All other fields (healthscore, boolean, text) are informational (pass).
- * - **Per-field** (Handover Aquisição, Handover Monetização, Banco de Dados de Mídia):
- *   no "status" field — each field is evaluated individually.
+ * - **Status-driven** (BANT, Sales Coach, Account Coach, Auditoria, Banco de Dados):
+ *   only the status/status_execucao field determines severity. All other fields
+ *   (healthscore, boolean, text) are informational (pass).
+ * - **Per-field** (Handover Aquisição, Handover Monetização): each boolean checklist
+ *   field is evaluated individually — false/missing = error.
  */
 export function analyzeExecution(exec: ProjectExecution): ExecutionAnalysis {
+  const isPerField = PER_FIELD_PROJECTS.has(exec.projectId);
   const hasStatusField = exec.metadata.some((m) => m.type === "execution-status");
 
   const fields: FieldResult[] = exec.metadata.map((item) => {
     let severity: Severity;
-    if (hasStatusField && item.type !== "execution-status") {
+    if (!isPerField && hasStatusField && item.type !== "execution-status") {
       // Status-driven mode: only status field determines errors
       severity = "pass";
     } else {

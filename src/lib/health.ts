@@ -1,8 +1,8 @@
 import { subHours } from "date-fns";
 import type { ExecutionAnalysis } from "@/lib/data/types";
 
-/** Hours without executions before a project is considered inactive */
-export const INACTIVE_THRESHOLD_HOURS = 24;
+/** Hours without executions before a project is considered inactive (7 days) */
+export const INACTIVE_THRESHOLD_HOURS = 168;
 
 export type HealthStatus = "healthy" | "warning" | "critical" | "inactive";
 

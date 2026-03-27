@@ -28,7 +28,7 @@ function buildMetadataItems(
     let type: MetadataItem["type"];
     if (key === "healthscore") {
       type = "healthscore";
-    } else if (key === "status") {
+    } else if (key === "status" || key === "status_execucao") {
       type = "execution-status";
     } else if (typeof normalized === "boolean") {
       type = "boolean";

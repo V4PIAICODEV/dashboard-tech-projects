@@ -109,6 +109,7 @@ export const FIELD_LABELS: Record<string, Record<string, string>> = {
   },
   // Auditoria do Saber
   [ID.AUDITORIA]: {
+    status_execucao: "Status da Execucao",
     resumo: "Resumo",
     avaliacao_conteudo: "Avaliacao do Conteudo",
     ortografia_adequada: "Ortografia Adequada",
