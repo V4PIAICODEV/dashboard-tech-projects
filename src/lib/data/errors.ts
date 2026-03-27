@@ -2,7 +2,7 @@ import type { MetadataItem, Severity, FieldResult, ExecutionAnalysis, ProjectExe
 import { PROJECT_IDS } from "@/lib/config";
 
 /** Projects that use per-field error detection (boolean checklist items) */
-const PER_FIELD_PROJECTS = new Set([PROJECT_IDS.HANDOVER_AQUISICAO, PROJECT_IDS.HANDOVER_MONETIZACAO]);
+const PER_FIELD_PROJECTS: Set<string> = new Set([PROJECT_IDS.HANDOVER_AQUISICAO, PROJECT_IDS.HANDOVER_MONETIZACAO]);
 
 // Individual detector functions (not exported -- internal)
 

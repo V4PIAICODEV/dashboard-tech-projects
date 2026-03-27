@@ -28,10 +28,10 @@ const DIMENSION_SHORT: Record<string, string> = {
   "Consciência da Jornada V4": "Jornada",
 };
 
-const FLAG_COLORS: Record<string, { bg: string; text: string }> = {
-  green: { bg: "hsl(142 71% 25%)", text: "hsl(142 71% 73%)" },
-  yellow: { bg: "hsl(48 96% 25%)", text: "hsl(48 96% 73%)" },
-  red: { bg: "hsl(0 72% 25%)", text: "hsl(0 72% 73%)" },
+const FLAG_COLORS: Record<string, { backgroundColor: string; color: string }> = {
+  green: { backgroundColor: "hsl(142 71% 25%)", color: "hsl(142 71% 73%)" },
+  yellow: { backgroundColor: "hsl(48 96% 25%)", color: "hsl(48 96% 73%)" },
+  red: { backgroundColor: "hsl(0 72% 25%)", color: "hsl(0 72% 73%)" },
 };
 
 interface ClientRow {
@@ -332,8 +332,8 @@ export function ClientOverviewTable({
                           className="text-xs font-semibold px-2 py-0.5 rounded-full"
                           style={
                             FLAG_COLORS[row.saudeFlag.toLowerCase()] ?? {
-                              bg: "transparent",
-                              text: "inherit",
+                              backgroundColor: "transparent",
+                              color: "inherit",
                             }
                           }
                         >
