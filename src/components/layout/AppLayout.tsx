@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Toaster } from "@/components/ui/sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 /**
  * App shell layout with header and main content area.
@@ -13,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
  * - isRefetching: any webhook query refetching in background
  */
 export function AppLayout() {
+  const { theme } = useTheme();
   const queryClientInstance = useQueryClient();
   const isFetching = useIsFetching({ queryKey: ["webhook"] });
 
@@ -51,7 +53,7 @@ export function AppLayout() {
       <main className="mx-auto max-w-[1200px] px-8 pt-6 mt-16">
         <Outlet />
       </main>
-      <Toaster theme="dark" richColors />
+      <Toaster theme={theme} richColors />
     </div>
   );
 }

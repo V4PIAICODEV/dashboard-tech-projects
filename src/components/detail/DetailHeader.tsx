@@ -1,6 +1,7 @@
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { queryClient } from "@/App";
 
@@ -31,8 +32,10 @@ export function DetailHeader({ projectName, isRefetching }: DetailHeaderProps) {
           <h1 className="text-xl font-semibold">{projectName}</h1>
         </div>
 
-        {/* Right: refresh + logout */}
+        {/* Right: theme toggle + refresh + logout */}
         <div className="flex items-center gap-4">
+          <ThemeToggle />
+
           <Button
             variant="outline"
             size="sm"

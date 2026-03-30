@@ -3,6 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { Button } from "@/components/ui/button";
 import { AlertSettings } from "@/components/AlertSettings";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { queryClient } from "@/App";
 
@@ -44,6 +45,8 @@ export function DashboardHeader({
           </span>
 
           <AlertSettings />
+
+          <ThemeToggle />
 
           <Button
             variant="outline"
